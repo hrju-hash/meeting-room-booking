@@ -11,38 +11,31 @@ class DataManager {
             this.rooms = [
                 {
                     id: 1,
-                    name: '회의실 A',
-                    capacity: 10,
-                    location: '3층',
-                    facilities: ['프로젝터', '화이트보드', '전화']
+                    name: '1701호 소회의실 A',
+                    capacity: 6,
+                    location: '17층',
+                    facilities: ['프로젝터', '화이트보드']
                 },
                 {
                     id: 2,
-                    name: '회의실 B',
+                    name: '1701호 소회의실 B',
                     capacity: 6,
-                    location: '3층',
+                    location: '17층',
                     facilities: ['프로젝터', '화이트보드']
                 },
                 {
                     id: 3,
-                    name: '대회의실',
+                    name: '1701호 대회의실',
                     capacity: 20,
-                    location: '4층',
+                    location: '17층',
                     facilities: ['프로젝터', '화이트보드', '전화', '음향시설']
                 },
                 {
                     id: 4,
-                    name: '소회의실',
+                    name: '1703호 소회의실',
                     capacity: 4,
-                    location: '2층',
+                    location: '17층',
                     facilities: ['화이트보드']
-                },
-                {
-                    id: 5,
-                    name: '세미나실',
-                    capacity: 30,
-                    location: '5층',
-                    facilities: ['프로젝터', '음향시설', '마이크']
                 }
             ];
             this.saveRooms();
