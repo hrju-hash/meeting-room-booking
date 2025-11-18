@@ -281,30 +281,37 @@ class UI {
         const list = document.getElementById('bookings-list');
         list.innerHTML = '';
 
-        let filteredBookings = [...this.dataManager.bookings];
+        // 회의실 예약과 줌 예약을 합치기
+        let allBookings = [
+            ...this.dataManager.bookings.map(b => ({...b, isZoom: false})),
+            ...this.dataManager.zoomBookings.map(b => ({...b, isZoom: true}))
+        ];
         
         // 날짜 필터
         const dateFilter = document.getElementById('filter-date').value;
         if (dateFilter) {
-            filteredBookings = filteredBookings.filter(b => b.date === dateFilter);
+            allBookings = allBookings.filter(b => b.date === dateFilter);
         }
 
-        // 회의실 필터
+        // 회의실 필터 (줌 예약은 필터에서 제외)
         const roomFilter = document.getElementById('filter-room').value;
         if (roomFilter) {
-            filteredBookings = filteredBookings.filter(b => b.roomId === parseInt(roomFilter));
+            allBookings = allBookings.filter(b => {
+                if (b.isZoom) return false; // 줌 예약은 회의실 필터에서 제외
+                return b.roomId === parseInt(roomFilter);
+            });
         }
 
         // 회의실 필터 옵션 업데이트
         this.updateRoomFilterOptions();
 
         // 날짜순 정렬
-        filteredBookings.sort((a, b) => {
+        allBookings.sort((a, b) => {
             if (a.date !== b.date) return a.date.localeCompare(b.date);
             return a.startTime.localeCompare(b.startTime);
         });
 
-        if (filteredBookings.length === 0) {
+        if (allBookings.length === 0) {
             list.innerHTML = `
                 <div class="empty-state">
                     <div class="empty-state-icon">📅</div>
@@ -315,29 +322,55 @@ class UI {
             return;
         }
 
-        filteredBookings.forEach(booking => {
-            const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+        allBookings.forEach(booking => {
             const card = document.createElement('div');
             card.className = 'booking-card';
-            card.innerHTML = `
-                <div class="booking-info">
-                    <h3>${booking.roomName}</h3>
-                    <div class="booking-details">
-                        <div><strong>날짜:</strong> ${this.formatDate(booking.date)}</div>
-                        <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
-                        <div><strong>예약자:</strong> ${booking.userName}</div>
-                        ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
-                        ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
-                    </div>
-                </div>
-                <button class="btn-danger" data-booking-id="${booking.id}">취소</button>
-            `;
             
-            card.querySelector('.btn-danger').addEventListener('click', () => {
-                if (confirm('정말 예약을 취소하시겠습니까?')) {
-                    this.cancelBooking(booking.id);
-                }
-            });
+            if (booking.isZoom) {
+                // 줌 예약 카드
+                card.innerHTML = `
+                    <div class="booking-info">
+                        <h3>📹 줌 예약</h3>
+                        <div class="booking-details">
+                            <div><strong>날짜:</strong> ${this.formatDate(booking.date)}</div>
+                            <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                            <div><strong>예약자:</strong> ${booking.userName}</div>
+                            ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                            ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
+                            ${booking.roomName ? `<div><strong>회의실:</strong> ${booking.roomName}</div>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-danger" data-zoom-booking-id="${booking.id}">취소</button>
+                `;
+                
+                card.querySelector('.btn-danger').addEventListener('click', () => {
+                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                        this.cancelZoomBooking(booking.id);
+                    }
+                });
+            } else {
+                // 회의실 예약 카드
+                const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+                card.innerHTML = `
+                    <div class="booking-info">
+                        <h3>${booking.roomName}</h3>
+                        <div class="booking-details">
+                            <div><strong>날짜:</strong> ${this.formatDate(booking.date)}</div>
+                            <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                            <div><strong>예약자:</strong> ${booking.userName}</div>
+                            ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                            ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
+                        </div>
+                    </div>
+                    <button class="btn-danger" data-booking-id="${booking.id}">취소</button>
+                `;
+                
+                card.querySelector('.btn-danger').addEventListener('click', () => {
+                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                        this.cancelBooking(booking.id);
+                    }
+                });
+            }
             
             list.appendChild(card);
         });
@@ -540,24 +573,16 @@ class UI {
         document.getElementById('booking-start').value = startTime;
         document.getElementById('booking-end').value = endTime;
 
-        const roomId = parseInt(document.getElementById('booking-room').value);
         const date = document.getElementById('booking-date').value;
         const userName = document.getElementById('booking-user').value;
         const purpose = document.getElementById('booking-purpose').value;
+        const attendees = document.getElementById('booking-attendees').value;
 
         // 유효성 검사
         if (startTime >= endTime) {
             this.showNotification('종료 시간은 시작 시간보다 늦어야 합니다.', 'error');
             return;
         }
-
-        // 시간 충돌 확인
-        if (!this.dataManager.isTimeSlotAvailable(roomId, date, startTime, endTime)) {
-            this.showNotification('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.', 'error');
-            return;
-        }
-
-        const attendees = document.getElementById('booking-attendees').value;
 
         // 줌 전용 예약인지 확인
         const isZoomOnly = document.getElementById('booking-room').closest('.form-group').style.display === 'none';
@@ -573,32 +598,33 @@ class UI {
                 date,
                 startTime,
                 endTime,
-                userName: document.getElementById('booking-user').value,
+                userName,
                 attendees: attendees || '',
-                purpose: document.getElementById('booking-purpose').value
+                purpose
             };
 
             this.dataManager.addZoomBooking(zoomBooking);
             this.closeBookingModal();
             this.renderZoomAccount();
+            this.renderBookings();
             this.renderCalendar();
             this.showNotification('줌 예약이 완료되었습니다!');
             return;
         }
 
         // 회의실 예약
-        const roomId2 = parseInt(document.getElementById('booking-room').value);
+        const roomId = parseInt(document.getElementById('booking-room').value);
         
         // 시간 충돌 확인
-        if (!this.dataManager.isTimeSlotAvailable(roomId2, date, startTime, endTime)) {
+        if (!this.dataManager.isTimeSlotAvailable(roomId, date, startTime, endTime)) {
             this.showNotification('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.', 'error');
             return;
         }
 
-        const room = this.dataManager.rooms.find(r => r.id === roomId2);
+        const room = this.dataManager.rooms.find(r => r.id === roomId);
         
         const booking = {
-            roomId: roomId2,
+            roomId,
             roomName: room.name,
             date,
             startTime,
@@ -628,6 +654,7 @@ class UI {
 
     cancelZoomBooking(bookingId) {
         this.dataManager.deleteZoomBooking(bookingId);
+        this.renderBookings();
         this.renderCalendar();
         this.showNotification('줌 예약이 취소되었습니다.');
     }
