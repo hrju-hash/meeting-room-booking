@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>회의실 예약 시스템</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🏢 회의실 예약 시스템</h1>
+            <nav>
+                <button class="nav-btn active" data-page="rooms">회의실 목록</button>
+                <button class="nav-btn" data-page="bookings">내 예약</button>
+            </nav>
+        </header>
+
+        <!-- 회의실 목록 페이지 -->
+        <section id="rooms-page" class="page active">
+            <div class="page-header">
+                <h2>회의실 목록</h2>
+                <button class="btn-primary" id="new-booking-btn">새 예약하기</button>
+            </div>
+            <div class="rooms-grid" id="rooms-grid">
+                <!-- 회의실 카드들이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </section>
+
+        <!-- 예약 목록 페이지 -->
+        <section id="bookings-page" class="page">
+            <div class="page-header">
+                <h2>내 예약 목록</h2>
+                <div class="filter-group">
+                    <input type="date" id="filter-date" class="filter-input">
+                    <select id="filter-room" class="filter-input">
+                        <option value="">전체 회의실</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bookings-list" id="bookings-list">
+                <!-- 예약 목록이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </section>
+
+        <!-- 예약 모달 -->
+        <div id="booking-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>회의실 예약</h2>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                <form id="booking-form">
+                    <div class="form-group">
+                        <label for="booking-room">회의실 선택</label>
+                        <select id="booking-room" required>
+                            <option value="">회의실을 선택하세요</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-date">날짜</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-start">시작 시간</label>
+                        <input type="time" id="booking-start" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-end">종료 시간</label>
+                        <input type="time" id="booking-end" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-user">예약자 이름</label>
+                        <input type="text" id="booking-user" placeholder="이름을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-purpose">회의 목적</label>
+                        <textarea id="booking-purpose" placeholder="회의 목적을 입력하세요" rows="3"></textarea>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancel-booking">취소</button>
+                        <button type="submit" class="btn-primary">예약하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
