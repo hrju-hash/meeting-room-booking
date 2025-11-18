@@ -95,6 +95,8 @@ class UI {
     constructor(dataManager) {
         this.dataManager = dataManager;
         this.currentPage = 'rooms';
+        this.currentMonth = new Date().getMonth();
+        this.currentYear = new Date().getFullYear();
         this.init();
     }
 
@@ -102,6 +104,7 @@ class UI {
         this.setupEventListeners();
         this.renderRooms();
         this.renderBookings();
+        this.renderCalendar();
         this.setupModal();
     }
 
@@ -125,6 +128,25 @@ class UI {
         });
         document.getElementById('filter-room').addEventListener('change', () => {
             this.renderBookings();
+        });
+
+        // 달력 네비게이션
+        document.getElementById('prev-month').addEventListener('click', () => {
+            this.currentMonth--;
+            if (this.currentMonth < 0) {
+                this.currentMonth = 11;
+                this.currentYear--;
+            }
+            this.renderCalendar();
+        });
+
+        document.getElementById('next-month').addEventListener('click', () => {
+            this.currentMonth++;
+            if (this.currentMonth > 11) {
+                this.currentMonth = 0;
+                this.currentYear++;
+            }
+            this.renderCalendar();
         });
     }
 
@@ -371,6 +393,126 @@ class UI {
         setTimeout(() => {
             notification.classList.remove('show');
         }, 3000);
+    }
+
+    renderCalendar() {
+        const grid = document.getElementById('calendar-grid');
+        const monthYearEl = document.getElementById('current-month-year');
+        
+        // 월/년도 표시
+        const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', 
+                           '7월', '8월', '9월', '10월', '11월', '12월'];
+        monthYearEl.textContent = `${this.currentYear}년 ${monthNames[this.currentMonth]}`;
+
+        // 달력 그리드 초기화
+        grid.innerHTML = '';
+
+        // 요일 헤더
+        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        weekdays.forEach(day => {
+            const dayHeader = document.createElement('div');
+            dayHeader.className = 'calendar-day-header';
+            dayHeader.textContent = day;
+            grid.appendChild(dayHeader);
+        });
+
+        // 첫 날짜와 마지막 날짜 계산
+        const firstDay = new Date(this.currentYear, this.currentMonth, 1);
+        const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
+        const startDate = new Date(firstDay);
+        startDate.setDate(startDate.getDate() - startDate.getDay());
+
+        // 6주 표시 (42일)
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        for (let i = 0; i < 42; i++) {
+            const currentDate = new Date(startDate);
+            currentDate.setDate(startDate.getDate() + i);
+            
+            const dayCell = document.createElement('div');
+            dayCell.className = 'calendar-day';
+            
+            // 다른 월의 날짜는 회색으로
+            if (currentDate.getMonth() !== this.currentMonth) {
+                dayCell.classList.add('other-month');
+            }
+            
+            // 오늘 날짜 강조
+            if (currentDate.getTime() === today.getTime()) {
+                dayCell.classList.add('today');
+            }
+
+            const dayNumber = document.createElement('div');
+            dayNumber.className = 'day-number';
+            dayNumber.textContent = currentDate.getDate();
+            dayCell.appendChild(dayNumber);
+
+            // 해당 날짜의 예약 목록 가져오기
+            const dateStr = this.formatDateForCalendar(currentDate);
+            const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
+            
+            // 시간순으로 정렬
+            dayBookings.sort((a, b) => a.startTime.localeCompare(b.startTime));
+
+            // 예약 이벤트 표시
+            dayBookings.forEach(booking => {
+                const event = document.createElement('div');
+                event.className = 'calendar-event';
+                
+                const time = document.createElement('span');
+                time.className = 'event-time';
+                time.textContent = `${this.formatTime(booking.startTime)}`;
+                
+                const roomName = document.createElement('span');
+                roomName.className = 'event-room';
+                roomName.textContent = booking.roomName;
+                
+                event.appendChild(time);
+                event.appendChild(roomName);
+                
+                // 클릭 시 상세 정보 표시
+                event.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    this.showBookingDetails(booking);
+                });
+                
+                dayCell.appendChild(event);
+            });
+
+            grid.appendChild(dayCell);
+        }
+    }
+
+    formatDateForCalendar(date) {
+        const year = date.getFullYear();
+        const month = String(date.getMonth() + 1).padStart(2, '0');
+        const day = String(date.getDate()).padStart(2, '0');
+        return `${year}-${month}-${day}`;
+    }
+
+    formatTime(timeStr) {
+        // "09:30" -> "9시 30분"
+        const [hours, minutes] = timeStr.split(':');
+        const hour = parseInt(hours);
+        const min = parseInt(minutes);
+        if (min === 0) {
+            return `${hour}시`;
+        }
+        return `${hour}시 ${min}분`;
+    }
+
+    showBookingDetails(booking) {
+        const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+        const details = `
+회의실: ${booking.roomName}
+날짜: ${this.formatDate(booking.date)}
+시간: ${booking.startTime} ~ ${booking.endTime}
+예약자: ${booking.userName}
+${booking.purpose ? `목적: ${booking.purpose}` : ''}
+        `.trim();
+        
+        alert(details);
     }
 }
 
