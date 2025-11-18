@@ -219,10 +219,12 @@ nav {
 }
 
 /* Bookings List */
-.bookings-list {
+.bookings-list,
+.zoom-bookings-list {
     display: flex;
     flex-direction: column;
     gap: 16px;
+    margin-top: 24px;
 }
 
 .booking-card {
@@ -625,4 +627,3 @@ form {
         justify-content: center;
     }
 }
-
