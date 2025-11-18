@@ -462,16 +462,16 @@ class UI {
                 const event = document.createElement('div');
                 event.className = 'calendar-event';
                 
-                const time = document.createElement('span');
-                time.className = 'event-time';
-                time.textContent = `${this.formatTime(booking.startTime)}`;
-                
                 const roomName = document.createElement('span');
                 roomName.className = 'event-room';
                 roomName.textContent = booking.roomName;
                 
-                event.appendChild(time);
+                const time = document.createElement('span');
+                time.className = 'event-time';
+                time.textContent = `${this.formatTime(booking.startTime)}`;
+                
                 event.appendChild(roomName);
+                event.appendChild(time);
                 
                 // 클릭 시 상세 정보 표시
                 event.addEventListener('click', (e) => {

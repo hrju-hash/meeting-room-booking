@@ -544,16 +544,18 @@ form {
     transform: translateX(2px);
 }
 
-.event-time {
-    font-weight: 600;
-    white-space: nowrap;
-}
-
 .event-room {
+    font-weight: 600;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
     flex: 1;
+}
+
+.event-time {
+    white-space: nowrap;
+    color: var(--text-secondary);
+    font-size: 11px;
 }
 
 /* Responsive */
