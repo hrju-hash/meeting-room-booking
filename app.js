@@ -301,25 +301,72 @@ class UI {
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').setAttribute('min', today);
 
-        // 시간 입력을 10분 단위로 조정
-        document.getElementById('booking-start').addEventListener('change', (e) => {
-            e.target.value = this.roundTo10Minutes(e.target.value);
+        // 시간 선택 드롭다운 초기화
+        this.initTimeSelects();
+
+        // 시간 선택 시 hidden input 업데이트
+        document.getElementById('booking-start-hour').addEventListener('change', () => {
+            this.updateTimeInput('start');
         });
-        document.getElementById('booking-end').addEventListener('change', (e) => {
-            e.target.value = this.roundTo10Minutes(e.target.value);
+        document.getElementById('booking-start-minute').addEventListener('change', () => {
+            this.updateTimeInput('start');
+        });
+        document.getElementById('booking-end-hour').addEventListener('change', () => {
+            this.updateTimeInput('end');
+        });
+        document.getElementById('booking-end-minute').addEventListener('change', () => {
+            this.updateTimeInput('end');
         });
     }
 
-    roundTo10Minutes(timeStr) {
-        if (!timeStr) return timeStr;
-        const [hours, minutes] = timeStr.split(':').map(Number);
-        const roundedMinutes = Math.round(minutes / 10) * 10;
-        if (roundedMinutes >= 60) {
-            const newHours = (hours + 1) % 24;
-            const newMinutes = roundedMinutes % 60;
-            return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+    initTimeSelects() {
+        // 시간 옵션 (0-23)
+        const startHourSelect = document.getElementById('booking-start-hour');
+        const endHourSelect = document.getElementById('booking-end-hour');
+        
+        for (let i = 0; i < 24; i++) {
+            const option1 = document.createElement('option');
+            option1.value = String(i).padStart(2, '0');
+            option1.textContent = `${i}시`;
+            startHourSelect.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = String(i).padStart(2, '0');
+            option2.textContent = `${i}시`;
+            endHourSelect.appendChild(option2);
         }
-        return `${String(hours).padStart(2, '0')}:${String(roundedMinutes).padStart(2, '0')}`;
+
+        // 분 옵션 (0, 10, 20, 30, 40, 50)
+        const startMinuteSelect = document.getElementById('booking-start-minute');
+        const endMinuteSelect = document.getElementById('booking-end-minute');
+        
+        const minutes = [0, 10, 20, 30, 40, 50];
+        minutes.forEach(min => {
+            const option1 = document.createElement('option');
+            option1.value = String(min).padStart(2, '0');
+            option1.textContent = `${min}분`;
+            startMinuteSelect.appendChild(option1);
+
+            const option2 = document.createElement('option');
+            option2.value = String(min).padStart(2, '0');
+            option2.textContent = `${min}분`;
+            endMinuteSelect.appendChild(option2);
+        });
+    }
+
+    updateTimeInput(type) {
+        const hourSelect = document.getElementById(`booking-${type}-hour`);
+        const minuteSelect = document.getElementById(`booking-${type}-minute`);
+        const hiddenInput = document.getElementById(`booking-${type}`);
+
+        const hour = hourSelect.value;
+        const minute = minuteSelect.value;
+
+        if (hour && minute) {
+            hiddenInput.value = `${hour}:${minute}`;
+        } else {
+            hiddenInput.value = '';
+        }
     }
 
     openBookingModal(roomId = null) {
@@ -343,6 +390,14 @@ class UI {
         // 날짜 기본값
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').value = today;
+
+        // 시간 선택 초기화
+        document.getElementById('booking-start-hour').value = '';
+        document.getElementById('booking-start-minute').value = '';
+        document.getElementById('booking-end-hour').value = '';
+        document.getElementById('booking-end-minute').value = '';
+        document.getElementById('booking-start').value = '';
+        document.getElementById('booking-end').value = '';
 
         modal.classList.add('active');
     }

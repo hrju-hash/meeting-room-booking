@@ -81,11 +81,29 @@
                     </div>
                     <div class="form-group">
                         <label for="booking-start">시작 시간</label>
-                        <input type="time" id="booking-start" step="600" required>
+                        <div class="time-input-group">
+                            <select id="booking-start-hour" class="time-select" required>
+                                <option value="">시</option>
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="booking-start-minute" class="time-select" required>
+                                <option value="">분</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="booking-start" required>
                     </div>
                     <div class="form-group">
                         <label for="booking-end">종료 시간</label>
-                        <input type="time" id="booking-end" step="600" required>
+                        <div class="time-input-group">
+                            <select id="booking-end-hour" class="time-select" required>
+                                <option value="">시</option>
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="booking-end-minute" class="time-select" required>
+                                <option value="">분</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="booking-end" required>
                     </div>
                     <div class="form-group">
                         <label for="booking-user">예약자 이름</label>
