@@ -366,12 +366,14 @@ class UI {
         this.closeBookingModal();
         this.renderRooms();
         this.renderBookings();
+        this.renderCalendar();
         this.showNotification('예약이 완료되었습니다!');
     }
 
     cancelBooking(bookingId) {
         this.dataManager.deleteBooking(bookingId);
         this.renderBookings();
+        this.renderCalendar();
         this.showNotification('예약이 취소되었습니다.');
     }
 
