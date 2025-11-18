@@ -407,20 +407,27 @@ class UI {
     }
 
     submitBooking() {
-        const roomId = parseInt(document.getElementById('booking-room').value);
-        const date = document.getElementById('booking-date').value;
-        let startTime = document.getElementById('booking-start').value;
-        let endTime = document.getElementById('booking-end').value;
-        const userName = document.getElementById('booking-user').value;
-        const purpose = document.getElementById('booking-purpose').value;
+        // 시간 입력 확인 (드롭다운에서 직접 확인)
+        const startHour = document.getElementById('booking-start-hour').value;
+        const startMinute = document.getElementById('booking-start-minute').value;
+        const endHour = document.getElementById('booking-end-hour').value;
+        const endMinute = document.getElementById('booking-end-minute').value;
 
-        // 시간을 10분 단위로 조정
-        startTime = this.roundTo10Minutes(startTime);
-        endTime = this.roundTo10Minutes(endTime);
-        
-        // 조정된 시간을 다시 입력 필드에 설정
+        if (!startHour || !startMinute || !endHour || !endMinute) {
+            this.showNotification('시작 시간과 종료 시간을 모두 선택해주세요.', 'error');
+            return;
+        }
+
+        // hidden input 업데이트
+        const startTime = `${startHour}:${startMinute}`;
+        const endTime = `${endHour}:${endMinute}`;
         document.getElementById('booking-start').value = startTime;
         document.getElementById('booking-end').value = endTime;
+
+        const roomId = parseInt(document.getElementById('booking-room').value);
+        const date = document.getElementById('booking-date').value;
+        const userName = document.getElementById('booking-user').value;
+        const purpose = document.getElementById('booking-purpose').value;
 
         // 유효성 검사
         if (startTime >= endTime) {
