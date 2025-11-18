@@ -136,6 +136,7 @@ class UI {
     init() {
         this.setupEventListeners();
         this.renderRooms();
+        this.renderZoomAccount();
         this.renderBookings();
         this.renderCalendar();
         this.setupModal();
@@ -196,6 +197,9 @@ class UI {
             this.renderBookings();
         } else if (page === 'calendar') {
             this.renderCalendar();
+        } else if (page === 'rooms') {
+            this.renderRooms();
+            this.renderZoomAccount();
         }
     }
 
@@ -203,7 +207,6 @@ class UI {
         const grid = document.getElementById('rooms-grid');
         grid.innerHTML = '';
 
-        // 회의실 카드 렌더링
         this.dataManager.rooms.forEach(room => {
             const card = document.createElement('div');
             card.className = 'room-card';
@@ -234,6 +237,13 @@ class UI {
             
             grid.appendChild(card);
         });
+    }
+
+    renderZoomAccount() {
+        const grid = document.getElementById('zoom-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = '';
 
         // 줌 계정 카드 추가
         const zoomCard = document.createElement('div');
@@ -258,7 +268,7 @@ class UI {
         zoomBookBtn.className = 'btn-primary';
         zoomBookBtn.style.marginTop = '16px';
         zoomBookBtn.style.width = '100%';
-        zoomBookBtn.textContent = '예약하기';
+        zoomBookBtn.textContent = '줌 예약';
         zoomBookBtn.addEventListener('click', () => {
             this.openZoomBookingModal();
         });
@@ -573,7 +583,7 @@ class UI {
 
             this.dataManager.addZoomBooking(zoomBooking);
             this.closeBookingModal();
-            this.renderRooms();
+            this.renderZoomAccount();
             this.renderCalendar();
             this.showNotification('줌 계정 예약이 완료되었습니다!');
             return;
@@ -625,6 +635,7 @@ class UI {
 
         this.closeBookingModal();
         this.renderRooms();
+        this.renderZoomAccount();
         this.renderBookings();
         this.renderCalendar();
         this.showNotification('예약이 완료되었습니다!');
