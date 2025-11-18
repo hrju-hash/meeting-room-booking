@@ -12,14 +12,14 @@ class DataManager {
                 {
                     id: 1,
                     name: '소회의실 A',
-                    capacity: 8,
+                    capacity: 4,
                     location: '1701호',
                     facilities: ['프로젝터', '화이트보드']
                 },
                 {
                     id: 2,
                     name: '소회의실 B',
-                    capacity: 8,
+                    capacity: 6,
                     location: '1701호',
                     facilities: ['프로젝터', '화이트보드']
                 },
