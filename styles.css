@@ -46,10 +46,23 @@ header {
     gap: 20px;
 }
 
+.header-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.logo {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+}
+
 header h1 {
     font-size: 28px;
     font-weight: 700;
     color: var(--primary-color);
+    margin: 0;
 }
 
 nav {

@@ -249,7 +249,7 @@ class UI {
         const zoomCard = document.createElement('div');
         zoomCard.className = 'room-card';
         zoomCard.innerHTML = `
-            <h3>📹 줌 계정</h3>
+            <h3>📹 줌 예약</h3>
             <div class="room-info">
                 <div class="room-info-item">
                     <strong>타입:</strong> 화상회의 계정
@@ -328,7 +328,6 @@ class UI {
                         <div><strong>예약자:</strong> ${booking.userName}</div>
                         ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
                         ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
-                        ${booking.useZoom ? `<div><strong>줌 계정:</strong> 예약됨</div>` : ''}
                     </div>
                 </div>
                 <button class="btn-danger" data-booking-id="${booking.id}">취소</button>
@@ -460,9 +459,6 @@ class UI {
         document.getElementById('booking-room').closest('.form-group').style.display = 'block';
         document.getElementById('booking-room').setAttribute('required', 'required');
 
-        // 줌 체크박스 활성화
-        document.getElementById('booking-zoom').disabled = false;
-
         // 회의실 선택 옵션 채우기
         const roomSelect = document.getElementById('booking-room');
         roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
@@ -488,7 +484,6 @@ class UI {
         document.getElementById('booking-start').value = '';
         document.getElementById('booking-end').value = '';
         document.getElementById('booking-attendees').value = '';
-        document.getElementById('booking-zoom').checked = false;
 
         modal.classList.add('active');
     }
@@ -499,15 +494,11 @@ class UI {
         form.reset();
 
         // 모달 제목 변경
-        document.querySelector('#booking-modal .modal-header h2').textContent = '줌 계정 예약';
+        document.querySelector('#booking-modal .modal-header h2').textContent = '줌 예약';
 
         // 회의실 선택 숨기기
         document.getElementById('booking-room').closest('.form-group').style.display = 'none';
         document.getElementById('booking-room').removeAttribute('required');
-
-        // 줌 체크박스 비활성화 (항상 체크됨)
-        document.getElementById('booking-zoom').checked = true;
-        document.getElementById('booking-zoom').disabled = true;
 
         // 날짜 기본값
         const today = new Date().toISOString().split('T')[0];
@@ -529,7 +520,6 @@ class UI {
         document.getElementById('booking-modal').classList.remove('active');
         // 회의실 선택 다시 표시
         document.getElementById('booking-room').closest('.form-group').style.display = 'block';
-        document.getElementById('booking-zoom').disabled = false;
     }
 
     submitBooking() {
@@ -550,11 +540,10 @@ class UI {
         document.getElementById('booking-start').value = startTime;
         document.getElementById('booking-end').value = endTime;
 
+        const roomId = parseInt(document.getElementById('booking-room').value);
         const date = document.getElementById('booking-date').value;
         const userName = document.getElementById('booking-user').value;
         const purpose = document.getElementById('booking-purpose').value;
-        const attendees = document.getElementById('booking-attendees').value;
-        const useZoom = document.getElementById('booking-zoom').checked;
 
         // 유효성 검사
         if (startTime >= endTime) {
@@ -562,13 +551,21 @@ class UI {
             return;
         }
 
+        // 시간 충돌 확인
+        if (!this.dataManager.isTimeSlotAvailable(roomId, date, startTime, endTime)) {
+            this.showNotification('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.', 'error');
+            return;
+        }
+
+        const attendees = document.getElementById('booking-attendees').value;
+
         // 줌 전용 예약인지 확인
         const isZoomOnly = document.getElementById('booking-room').closest('.form-group').style.display === 'none';
 
         if (isZoomOnly) {
             // 줌 전용 예약
             if (!this.dataManager.isZoomTimeSlotAvailable(date, startTime, endTime)) {
-                this.showNotification('해당 시간에 줌 계정이 이미 예약되어 있습니다.', 'error');
+                this.showNotification('해당 시간에 줌 예약이 이미 있습니다.', 'error');
                 return;
             }
 
@@ -585,22 +582,23 @@ class UI {
             this.closeBookingModal();
             this.renderZoomAccount();
             this.renderCalendar();
-            this.showNotification('줌 계정 예약이 완료되었습니다!');
+            this.showNotification('줌 예약이 완료되었습니다!');
             return;
         }
 
         // 회의실 예약
-        const roomId = parseInt(document.getElementById('booking-room').value);
+        const roomId2 = parseInt(document.getElementById('booking-room').value);
         
         // 시간 충돌 확인
-        if (!this.dataManager.isTimeSlotAvailable(roomId, date, startTime, endTime)) {
+        if (!this.dataManager.isTimeSlotAvailable(roomId2, date, startTime, endTime)) {
             this.showNotification('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.', 'error');
             return;
         }
 
-        const room = this.dataManager.rooms.find(r => r.id === roomId);
+        const room = this.dataManager.rooms.find(r => r.id === roomId2);
+        
         const booking = {
-            roomId,
+            roomId: roomId2,
             roomName: room.name,
             date,
             startTime,
@@ -608,30 +606,10 @@ class UI {
             userName,
             attendees: attendees || '',
             purpose,
-            useZoom
+            useZoom: false
         };
 
         this.dataManager.addBooking(booking);
-        
-        // 줌 계정 예약 처리
-        if (useZoom) {
-            if (!this.dataManager.isZoomTimeSlotAvailable(date, startTime, endTime)) {
-                this.showNotification('해당 시간에 줌 계정이 이미 예약되어 있습니다.', 'error');
-                return;
-            }
-            
-            const zoomBooking = {
-                date,
-                startTime,
-                endTime,
-                userName,
-                attendees: attendees || '',
-                purpose,
-                roomName: room.name
-            };
-            
-            this.dataManager.addZoomBooking(zoomBooking);
-        }
 
         this.closeBookingModal();
         this.renderRooms();
@@ -651,7 +629,7 @@ class UI {
     cancelZoomBooking(bookingId) {
         this.dataManager.deleteZoomBooking(bookingId);
         this.renderCalendar();
-        this.showNotification('줌 계정 예약이 취소되었습니다.');
+        this.showNotification('줌 예약이 취소되었습니다.');
     }
 
     formatDate(dateString) {
@@ -745,7 +723,7 @@ class UI {
                 
                 const roomName = document.createElement('span');
                 roomName.className = 'event-room';
-                roomName.textContent = booking.isZoom ? '📹 줌 계정' : (booking.roomName || '');
+                roomName.textContent = booking.isZoom ? '📹 줌 예약' : (booking.roomName || '');
                 
                 const time = document.createElement('span');
                 time.className = 'event-time';
@@ -789,7 +767,7 @@ class UI {
         let details = '';
         if (booking.isZoom) {
             details = `
-줌 계정 예약
+줌 예약
 날짜: ${this.formatDate(booking.date)}
 시간: ${booking.startTime} ~ ${booking.endTime}
 예약자: ${booking.userName}
@@ -810,7 +788,6 @@ ${booking.roomName ? `회의실: ${booking.roomName}` : ''}
 예약자: ${booking.userName}
 ${booking.attendees ? `참석자: ${booking.attendees}` : ''}
 ${booking.purpose ? `목적: ${booking.purpose}` : ''}
-${booking.useZoom ? `줌 계정: 예약됨` : ''}
             `.trim();
             
             if (confirm(details + '\n\n예약을 취소하시겠습니까?')) {
