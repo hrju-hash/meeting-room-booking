@@ -300,6 +300,26 @@ class UI {
         // 날짜 기본값을 오늘로 설정
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').setAttribute('min', today);
+
+        // 시간 입력을 10분 단위로 조정
+        document.getElementById('booking-start').addEventListener('change', (e) => {
+            e.target.value = this.roundTo10Minutes(e.target.value);
+        });
+        document.getElementById('booking-end').addEventListener('change', (e) => {
+            e.target.value = this.roundTo10Minutes(e.target.value);
+        });
+    }
+
+    roundTo10Minutes(timeStr) {
+        if (!timeStr) return timeStr;
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const roundedMinutes = Math.round(minutes / 10) * 10;
+        if (roundedMinutes >= 60) {
+            const newHours = (hours + 1) % 24;
+            const newMinutes = roundedMinutes % 60;
+            return `${String(newHours).padStart(2, '0')}:${String(newMinutes).padStart(2, '0')}`;
+        }
+        return `${String(hours).padStart(2, '0')}:${String(roundedMinutes).padStart(2, '0')}`;
     }
 
     openBookingModal(roomId = null) {
@@ -334,10 +354,18 @@ class UI {
     submitBooking() {
         const roomId = parseInt(document.getElementById('booking-room').value);
         const date = document.getElementById('booking-date').value;
-        const startTime = document.getElementById('booking-start').value;
-        const endTime = document.getElementById('booking-end').value;
+        let startTime = document.getElementById('booking-start').value;
+        let endTime = document.getElementById('booking-end').value;
         const userName = document.getElementById('booking-user').value;
         const purpose = document.getElementById('booking-purpose').value;
+
+        // 시간을 10분 단위로 조정
+        startTime = this.roundTo10Minutes(startTime);
+        endTime = this.roundTo10Minutes(endTime);
+        
+        // 조정된 시간을 다시 입력 필드에 설정
+        document.getElementById('booking-start').value = startTime;
+        document.getElementById('booking-end').value = endTime;
 
         // 유효성 검사
         if (startTime >= endTime) {
