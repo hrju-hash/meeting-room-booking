@@ -833,6 +833,53 @@ class UI {
         }, 3000);
     }
 
+    getKoreanHolidays(year) {
+        // 한국 공휴일 목록 (2024-2026 기준)
+        const holidays = [];
+        
+        // 고정 공휴일
+        holidays.push(`${year}-01-01`); // 신정
+        holidays.push(`${year}-03-01`); // 삼일절
+        holidays.push(`${year}-05-05`); // 어린이날
+        holidays.push(`${year}-06-06`); // 현충일
+        holidays.push(`${year}-08-15`); // 광복절
+        holidays.push(`${year}-10-03`); // 개천절
+        holidays.push(`${year}-10-09`); // 한글날
+        holidays.push(`${year}-12-25`); // 크리스마스
+        
+        // 음력 공휴일 (2024-2026 기준)
+        if (year === 2024) {
+            holidays.push('2024-02-10'); // 설날
+            holidays.push('2024-02-11'); // 설날
+            holidays.push('2024-02-12'); // 설날
+            holidays.push('2024-09-16'); // 추석
+            holidays.push('2024-09-17'); // 추석
+            holidays.push('2024-09-18'); // 추석
+        } else if (year === 2025) {
+            holidays.push('2025-01-29'); // 설날
+            holidays.push('2025-01-30'); // 설날
+            holidays.push('2025-01-31'); // 설날
+            holidays.push('2025-10-05'); // 추석
+            holidays.push('2025-10-06'); // 추석
+            holidays.push('2025-10-07'); // 추석
+        } else if (year === 2026) {
+            holidays.push('2026-02-17'); // 설날
+            holidays.push('2026-02-18'); // 설날
+            holidays.push('2026-02-19'); // 설날
+            holidays.push('2026-09-24'); // 추석
+            holidays.push('2026-09-25'); // 추석
+            holidays.push('2026-09-26'); // 추석
+        }
+        
+        return holidays;
+    }
+
+    isHoliday(dateStr) {
+        const year = parseInt(dateStr.split('-')[0]);
+        const holidays = this.getKoreanHolidays(year);
+        return holidays.includes(dateStr);
+    }
+
     renderCalendar() {
         const grid = document.getElementById('calendar-grid');
         const monthYearEl = document.getElementById('current-month-year');
@@ -871,6 +918,14 @@ class UI {
             const dayCell = document.createElement('div');
             dayCell.className = 'calendar-day';
             
+            // 요일 확인
+            const dayOfWeek = currentDate.getDay();
+            if (dayOfWeek === 0) {
+                dayCell.classList.add('sunday');
+            } else if (dayOfWeek === 6) {
+                dayCell.classList.add('saturday');
+            }
+            
             // 다른 월의 날짜는 회색으로
             if (currentDate.getMonth() !== this.currentMonth) {
                 dayCell.classList.add('other-month');
@@ -881,13 +936,19 @@ class UI {
                 dayCell.classList.add('today');
             }
 
+            const dateStr = this.formatDateForCalendar(currentDate);
+            const isHoliday = this.isHoliday(dateStr);
+            
+            if (isHoliday) {
+                dayCell.classList.add('holiday');
+            }
+
             const dayNumber = document.createElement('div');
             dayNumber.className = 'day-number';
             dayNumber.textContent = currentDate.getDate();
             dayCell.appendChild(dayNumber);
 
             // 해당 날짜의 예약 목록 가져오기
-            const dateStr = this.formatDateForCalendar(currentDate);
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
             const dayZoomBookings = this.dataManager.zoomBookings.filter(b => b.date === dateStr);
             
@@ -986,21 +1047,16 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
     }
 
     setupFAQ() {
-        // FAQ 항목에 클릭 이벤트 추가
+        // 기존 이벤트 리스너 제거를 위해 모든 FAQ 항목 재설정
         const faqItems = document.querySelectorAll('.faq-item');
         
-        faqItems.forEach((item) => {
+        faqItems.forEach((item, index) => {
+            // 기존 이벤트 리스너 제거를 위해 새로 설정
             const question = item.querySelector('.faq-question');
             if (question) {
-                // 기존 이벤트 리스너가 있다면 제거하고 새로 추가
-                const newQuestion = question.cloneNode(true);
-                question.parentNode.replaceChild(newQuestion, question);
-                
                 // 클릭 이벤트 리스너 추가
-                newQuestion.addEventListener('click', function(e) {
-                    e.preventDefault();
+                question.addEventListener('click', function(e) {
                     e.stopPropagation();
-                    
                     const isActive = item.classList.contains('active');
                     
                     // 모든 FAQ 항목 닫기

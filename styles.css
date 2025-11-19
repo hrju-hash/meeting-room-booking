@@ -56,7 +56,10 @@ header {
     width: 48px;
     height: 48px;
     object-fit: contain;
-    border-radius: 50%;
+    display: block;
+    flex-shrink: 0;
+    margin-right: 0;
+    vertical-align: middle;
 }
 
 header h1 {
@@ -750,4 +753,45 @@ form {
 .faq-link:hover {
     color: #4338ca;
     text-decoration: underline;
+}
+
+/* Footer */
+.footer {
+    margin-top: 60px;
+    padding: 24px;
+    text-align: center;
+    color: #4b5563;
+    font-size: 14px;
+}
+
+.footer p {
+    margin: 0;
+    color: #4b5563;
+}
+
+.footer a {
+    color: #4b5563;
+    text-decoration: none;
+}
+
+.footer a:hover {
+    text-decoration: underline;
+}
+
+/* Calendar day colors */
+.calendar-day.sunday .day-number,
+.calendar-day.holiday .day-number {
+    color: #ef4444;
+}
+
+.calendar-day.saturday .day-number {
+    color: #2563eb;
+}
+
+.calendar-day-header:nth-child(1) {
+    color: #ef4444;
+}
+
+.calendar-day-header:nth-child(7) {
+    color: #2563eb;
 }
