@@ -16,6 +16,7 @@
                 <nav>
                     <button class="nav-btn active" data-page="calendar">목록</button>
                     <button class="nav-btn" data-page="bookings">내 예약</button>
+                    <button class="nav-btn" data-page="faq">FAQ</button>
                 </nav>
         </header>
 
@@ -49,6 +50,103 @@
             </div>
             <div class="bookings-list" id="bookings-list">
                 <!-- 예약 목록이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </section>
+
+        <!-- FAQ 페이지 -->
+        <section id="faq-page" class="page">
+            <div class="page-header">
+                <h2>자주 묻는 질문 (FAQ)</h2>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>회의실 예약은 어떻게 하나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>1. 목록 페이지에서 원하는 날짜를 클릭합니다.</p>
+                        <p>2. 예약 모달에서 회의실을 선택합니다.</p>
+                        <p>3. 시작 시간과 종료 시간을 선택합니다 (10분 단위).</p>
+                        <p>4. 예약자 이름, 참석자 이름, 회의 목적을 입력합니다.</p>
+                        <p>5. 필요시 "줌 계정도 함께 예약하기" 체크박스를 선택합니다.</p>
+                        <p>6. "예약하기" 버튼을 클릭하여 예약을 완료합니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약을 취소하려면 어떻게 하나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>1. "내 예약" 페이지로 이동합니다.</p>
+                        <p>2. 취소하고 싶은 예약의 "취소" 버튼을 클릭합니다.</p>
+                        <p>3. 확인 메시지에서 "확인"을 클릭하면 예약이 취소됩니다.</p>
+                        <p>또는 달력에서 예약된 이벤트를 클릭하여 상세 정보를 확인하고 취소할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 시간을 변경할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>현재는 예약 시간 변경 기능이 제공되지 않습니다. 시간을 변경하려면 기존 예약을 취소하고 새로운 시간으로 다시 예약해주세요.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>줌 계정이 궁금해요</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>줌 계정 정보는 맑은소프트 PPM 게시판에서 확인할 수 있습니다.</p>
+                        <p><a href="https://malgn.mproject.co.kr/board/post_view.jsp?id=126636&m=cHJvamVjdDE4MTItbGluawEQUALEQUAL&pid=1812" target="_blank" rel="noopener noreferrer" class="faq-link">줌 계정 확인하기 →</a></p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>회의실과 줌 계정을 함께 예약할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 가능합니다. 회의실을 선택하면 "줌 계정도 함께 예약하기" 체크박스가 나타납니다. 이 체크박스를 선택하면 회의실과 줌 계정을 동시에 예약할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 시간은 몇 분 단위로 선택할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>예약 시간은 10분 단위로 선택할 수 있습니다. 시작 시간과 종료 시간 모두 0분, 10분, 20분, 30분, 40분, 50분 중에서 선택할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>같은 시간에 여러 회의실을 예약할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 가능합니다. 각 회의실은 독립적으로 예약되므로, 같은 시간에 서로 다른 회의실을 예약할 수 있습니다. 단, 같은 회의실의 같은 시간대는 중복 예약이 불가능합니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 후 알림을 받을 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>현재는 예약 알림 기능이 제공되지 않습니다. 예약 정보는 "내 예약" 페이지에서 확인할 수 있습니다. 향후 이메일 알림 기능이 추가될 예정입니다.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
