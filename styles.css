@@ -788,10 +788,7 @@ form {
     color: #2563eb;
 }
 
-.calendar-day-header:nth-child(1) {
-    color: #ef4444;
-}
-
+.calendar-day-header:nth-child(1),
 .calendar-day-header:nth-child(7) {
-    color: #2563eb;
+    color: white;
 }
