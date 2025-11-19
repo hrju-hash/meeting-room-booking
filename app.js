@@ -429,6 +429,23 @@ class UI {
         document.getElementById('booking-date').style.backgroundColor = '';
         document.getElementById('booking-date').style.cursor = '';
 
+        // 줌 체크박스 표시 (회의실이 선택된 경우)
+        if (roomId) {
+            document.getElementById('zoom-checkbox-group').style.display = 'block';
+        } else {
+            document.getElementById('zoom-checkbox-group').style.display = 'none';
+        }
+        document.getElementById('booking-zoom').checked = false;
+
+        // 회의실 선택 변경 이벤트 추가
+        roomSelect.onchange = () => {
+            if (roomSelect.value && roomSelect.value !== '' && roomSelect.value !== 'zoom') {
+                document.getElementById('zoom-checkbox-group').style.display = 'block';
+            } else {
+                document.getElementById('zoom-checkbox-group').style.display = 'none';
+            }
+        };
+
         // 시간 선택 초기화
         document.getElementById('booking-start-hour').value = '';
         document.getElementById('booking-start-minute').value = '';
@@ -475,13 +492,21 @@ class UI {
         zoomOption.textContent = '📹 줌 예약';
         roomSelect.appendChild(zoomOption);
 
+        // 줌 체크박스 숨기기 (초기 상태)
+        document.getElementById('zoom-checkbox-group').style.display = 'none';
+        document.getElementById('booking-zoom').checked = false;
+
         // 회의실 선택 변경 이벤트
         roomSelect.onchange = () => {
             if (roomSelect.value === 'zoom') {
-                // 줌 예약 선택 시 회의실 선택 숨기기
-                document.getElementById('booking-room').closest('.form-group').style.display = 'none';
+                // 줌 예약 선택 시 줌 체크박스 숨기기 (줌만 예약하는 경우)
+                document.getElementById('zoom-checkbox-group').style.display = 'none';
+            } else if (roomSelect.value && roomSelect.value !== '') {
+                // 회의실 선택 시 줌 체크박스 표시
+                document.getElementById('zoom-checkbox-group').style.display = 'block';
             } else {
-                document.getElementById('booking-room').closest('.form-group').style.display = 'block';
+                // 선택 없음
+                document.getElementById('zoom-checkbox-group').style.display = 'none';
             }
         };
 
@@ -505,9 +530,44 @@ class UI {
         // 모달 제목 변경
         document.querySelector('#booking-modal .modal-header h2').textContent = '줌 예약';
 
-        // 회의실 선택 숨기기
-        document.getElementById('booking-room').closest('.form-group').style.display = 'none';
-        document.getElementById('booking-room').removeAttribute('required');
+        // 회의실 선택 표시 (줌 예약도 선택 가능하도록)
+        document.getElementById('booking-room').closest('.form-group').style.display = 'block';
+        document.getElementById('booking-room').setAttribute('required', 'required');
+        
+        // 회의실 선택 옵션 채우기
+        const roomSelect = document.getElementById('booking-room');
+        roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
+        this.dataManager.rooms.forEach(room => {
+            const option = document.createElement('option');
+            option.value = room.id;
+            option.textContent = room.name;
+            roomSelect.appendChild(option);
+        });
+
+        // 줌 예약 옵션 추가
+        const zoomOption = document.createElement('option');
+        zoomOption.value = 'zoom';
+        zoomOption.textContent = '📹 줌 예약';
+        zoomOption.selected = true; // 기본 선택
+        roomSelect.appendChild(zoomOption);
+
+        // 회의실 선택 변경 이벤트
+        roomSelect.onchange = () => {
+            if (roomSelect.value === 'zoom') {
+                // 줌 예약 선택 시 줌 체크박스 숨기기
+                document.getElementById('zoom-checkbox-group').style.display = 'none';
+            } else if (roomSelect.value && roomSelect.value !== '') {
+                // 회의실 선택 시 줌 체크박스 표시
+                document.getElementById('zoom-checkbox-group').style.display = 'block';
+            } else {
+                // 선택 없음
+                document.getElementById('zoom-checkbox-group').style.display = 'none';
+            }
+        };
+
+        // 줌 체크박스 숨기기 (줌만 예약하는 경우)
+        document.getElementById('zoom-checkbox-group').style.display = 'none';
+        document.getElementById('booking-zoom').checked = false;
 
         // 날짜 기본값
         const today = new Date().toISOString().split('T')[0];
@@ -532,6 +592,9 @@ class UI {
         document.getElementById('booking-modal').classList.remove('active');
         // 회의실 선택 다시 표시
         document.getElementById('booking-room').closest('.form-group').style.display = 'block';
+        // 줌 체크박스 숨기기
+        document.getElementById('zoom-checkbox-group').style.display = 'none';
+        document.getElementById('booking-zoom').checked = false;
         // 날짜 필드 초기화
         document.getElementById('booking-date').removeAttribute('readonly');
         document.getElementById('booking-date').style.backgroundColor = '';
@@ -572,7 +635,7 @@ class UI {
 
         // 줌 전용 예약인지 확인
         const roomSelect = document.getElementById('booking-room');
-        const isZoomOnly = roomSelect.value === 'zoom' || roomSelect.closest('.form-group').style.display === 'none';
+        const isZoomOnly = roomSelect.value === 'zoom';
 
         if (isZoomOnly) {
             // 줌 전용 예약
@@ -614,6 +677,8 @@ class UI {
 
         const room = this.dataManager.rooms.find(r => r.id === roomId);
         
+        const useZoom = document.getElementById('booking-zoom') && document.getElementById('booking-zoom').checked;
+
         const booking = {
             roomId,
             roomName: room.name,
@@ -623,10 +688,29 @@ class UI {
             userName,
             attendees: attendees || '',
             purpose,
-            useZoom: false
+            useZoom: useZoom || false
         };
 
         this.dataManager.addBooking(booking);
+
+        // 줌 예약도 함께 처리
+        if (useZoom) {
+            // 줌 시간 충돌 확인
+            if (!this.dataManager.isZoomTimeSlotAvailable(date, startTime, endTime)) {
+                this.showNotification('회의실 예약은 완료되었지만, 해당 시간에 줌 예약이 이미 있어 줌 예약은 추가되지 않았습니다.', 'error');
+            } else {
+                const zoomBooking = {
+                    date,
+                    startTime,
+                    endTime,
+                    userName,
+                    attendees: attendees || '',
+                    purpose,
+                    roomName: room.name
+                };
+                this.dataManager.addZoomBooking(zoomBooking);
+            }
+        }
 
         this.closeBookingModal();
         this.renderBookings();
