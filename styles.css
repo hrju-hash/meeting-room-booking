@@ -539,6 +539,22 @@ form {
     gap: 4px;
     cursor: pointer;
     transition: background 0.2s;
+    position: relative;
+}
+
+.calendar-day::after {
+    content: '+';
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-size: 16px;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity 0.2s;
+}
+
+.calendar-day:hover::after {
+    opacity: 1;
 }
 
 .calendar-day:hover {
@@ -640,4 +656,98 @@ form {
         flex-wrap: wrap;
         justify-content: center;
     }
+}
+
+/* FAQ 스타일 */
+.faq-container {
+    background: var(--card-bg);
+    border-radius: 12px;
+    padding: 24px;
+    box-shadow: var(--shadow);
+}
+
+.faq-item {
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 0;
+}
+
+.faq-item:last-child {
+    border-bottom: none;
+}
+
+.faq-question {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 0;
+    cursor: pointer;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.faq-question:hover {
+    color: var(--primary-color);
+}
+
+.faq-question h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--text-primary);
+    margin: 0;
+    flex: 1;
+}
+
+.faq-toggle {
+    font-size: 24px;
+    font-weight: 300;
+    color: var(--text-secondary);
+    transition: transform 0.3s ease;
+    min-width: 24px;
+    text-align: center;
+    line-height: 1;
+}
+
+.faq-item.active .faq-toggle {
+    transform: rotate(45deg);
+}
+
+.faq-answer {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease, padding 0.3s ease;
+    padding: 0 0;
+}
+
+.faq-item.active .faq-answer {
+    max-height: 1000px;
+    padding: 0 0 20px 0;
+}
+
+.faq-answer p {
+    margin: 8px 0;
+    line-height: 1.6;
+    color: var(--text-secondary);
+    font-size: 14px;
+}
+
+.faq-answer p:first-child {
+    margin-top: 0;
+}
+
+.faq-answer p:last-child {
+    margin-bottom: 0;
+}
+
+.faq-link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    display: inline-block;
+    margin-top: 8px;
+    transition: color 0.2s;
+}
+
+.faq-link:hover {
+    color: #4338ca;
+    text-decoration: underline;
 }
