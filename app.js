@@ -138,6 +138,7 @@ class UI {
         this.renderBookings();
         this.renderCalendar();
         this.setupModal();
+        this.setupFAQ();
     }
 
     setupEventListeners() {
@@ -191,7 +192,83 @@ class UI {
             this.renderBookings();
         } else if (page === 'calendar') {
             this.renderCalendar();
+        } else if (page === 'faq') {
+            this.setupFAQ();
         }
+    }
+
+    renderRooms() {
+        const grid = document.getElementById('rooms-grid');
+        grid.innerHTML = '';
+
+        this.dataManager.rooms.forEach(room => {
+            const card = document.createElement('div');
+            card.className = 'room-card';
+            card.innerHTML = `
+                <h3>${room.name}</h3>
+                <div class="room-info">
+                    <div class="room-info-item">
+                        <strong>위치:</strong> ${room.location}
+                    </div>
+                    <div class="room-info-item">
+                        <strong>수용인원:</strong> ${room.capacity}명
+                    </div>
+                </div>
+                <div class="facilities">
+                    ${room.facilities.map(f => `<span class="facility-tag">${f}</span>`).join('')}
+                </div>
+            `;
+            
+            const bookBtn = document.createElement('button');
+            bookBtn.className = 'btn-primary';
+            bookBtn.style.marginTop = '16px';
+            bookBtn.style.width = '100%';
+            bookBtn.textContent = '예약하기';
+            bookBtn.addEventListener('click', () => {
+                this.openBookingModal(room.id);
+            });
+            card.appendChild(bookBtn);
+            
+            grid.appendChild(card);
+        });
+    }
+
+    renderZoomAccount() {
+        const grid = document.getElementById('zoom-grid');
+        if (!grid) return;
+        
+        grid.innerHTML = '';
+
+        // 줌 계정 카드 추가
+        const zoomCard = document.createElement('div');
+        zoomCard.className = 'room-card';
+        zoomCard.innerHTML = `
+            <h3>📹 줌 예약</h3>
+            <div class="room-info">
+                <div class="room-info-item">
+                    <strong>타입:</strong> 화상회의 계정
+                </div>
+                <div class="room-info-item">
+                    <strong>용도:</strong> 온라인 회의
+                </div>
+            </div>
+            <div class="facilities">
+                <span class="facility-tag">화상회의</span>
+                <span class="facility-tag">녹화 가능</span>
+            </div>
+        `;
+        
+        const zoomBookBtn = document.createElement('button');
+        zoomBookBtn.className = 'btn-primary';
+        zoomBookBtn.style.marginTop = '16px';
+        zoomBookBtn.style.width = '100%';
+        zoomBookBtn.textContent = '줌 예약';
+        zoomBookBtn.addEventListener('click', () => {
+            this.openZoomBookingModal();
+        });
+        zoomCard.appendChild(zoomBookBtn);
+        
+        grid.appendChild(zoomCard);
     }
 
     renderBookings() {
@@ -439,7 +516,7 @@ class UI {
 
         // 회의실 선택 변경 이벤트 추가
         roomSelect.onchange = () => {
-            if (roomSelect.value && roomSelect.value !== '' && roomSelect.value !== 'zoom') {
+            if (roomSelect.value && roomSelect.value !== '') {
                 document.getElementById('zoom-checkbox-group').style.display = 'block';
             } else {
                 document.getElementById('zoom-checkbox-group').style.display = 'none';
@@ -575,6 +652,10 @@ class UI {
         document.getElementById('booking-date').removeAttribute('readonly');
         document.getElementById('booking-date').style.backgroundColor = '';
         document.getElementById('booking-date').style.cursor = '';
+
+        // 줌 체크박스 숨기기
+        document.getElementById('zoom-checkbox-group').style.display = 'none';
+        document.getElementById('booking-zoom').checked = false;
 
         // 시간 선택 초기화
         document.getElementById('booking-start-hour').value = '';
@@ -756,11 +837,6 @@ class UI {
         const grid = document.getElementById('calendar-grid');
         const monthYearEl = document.getElementById('current-month-year');
         
-        if (!grid || !monthYearEl) {
-            console.error('Calendar elements not found');
-            return;
-        }
-        
         // 월/년도 표시
         const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', 
                            '7월', '8월', '9월', '10월', '11월', '12월'];
@@ -907,6 +983,42 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
                 this.cancelBooking(booking.id);
             }
         }
+    }
+
+    setupFAQ() {
+        // FAQ 항목에 클릭 이벤트 추가
+        const faqItems = document.querySelectorAll('.faq-item');
+        
+        faqItems.forEach((item) => {
+            const question = item.querySelector('.faq-question');
+            if (question) {
+                // 기존 이벤트 리스너가 있다면 제거하고 새로 추가
+                const newQuestion = question.cloneNode(true);
+                question.parentNode.replaceChild(newQuestion, question);
+                
+                // 클릭 이벤트 리스너 추가
+                newQuestion.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    const isActive = item.classList.contains('active');
+                    
+                    // 모든 FAQ 항목 닫기
+                    faqItems.forEach(otherItem => {
+                        if (otherItem !== item) {
+                            otherItem.classList.remove('active');
+                        }
+                    });
+                    
+                    // 클릭한 항목만 토글
+                    if (isActive) {
+                        item.classList.remove('active');
+                    } else {
+                        item.classList.add('active');
+                    }
+                });
+            }
+        });
     }
 }
 
