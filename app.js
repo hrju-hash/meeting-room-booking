@@ -1,4 +1,4 @@
-// 데이터 관리
+// ?�이??관�?
 class DataManager {
     constructor() {
         this.rooms = this.loadRooms();
@@ -12,31 +12,31 @@ class DataManager {
             this.rooms = [
                 {
                     id: 1,
-                    name: '소회의실 A',
+                    name: '?�회?�실 A',
                     capacity: 4,
-                    location: '1701호',
-                    facilities: ['프로젝터', '화이트보드']
+                    location: '1701??,
+                    facilities: ['?�로?�터', '?�이?�보??]
                 },
                 {
                     id: 2,
-                    name: '소회의실 B',
+                    name: '?�회?�실 B',
                     capacity: 6,
-                    location: '1701호',
-                    facilities: ['프로젝터', '화이트보드']
+                    location: '1701??,
+                    facilities: ['?�로?�터', '?�이?�보??]
                 },
                 {
                     id: 3,
-                    name: '소회의실 C',
+                    name: '?�회?�실 C',
                     capacity: 8,
-                    location: '1703호',
-                    facilities: ['프로젝터', '화이트보드']
+                    location: '1703??,
+                    facilities: ['?�로?�터', '?�이?�보??]
                 },
                 {
                     id: 4,
-                    name: '대회의실',
+                    name: '?�?�의??,
                     capacity: 20,
-                    location: '1701호',
-                    facilities: ['프로젝터', '화이트보드', '전화', '음향시설']
+                    location: '1701??,
+                    facilities: ['?�로?�터', '?�이?�보??, '?�화', '?�향?�설']
                 }
             ];
             this.saveRooms();
@@ -123,7 +123,7 @@ class DataManager {
     }
 }
 
-// UI 관리
+// UI 관�?
 class UI {
     constructor(dataManager) {
         this.dataManager = dataManager;
@@ -143,7 +143,7 @@ class UI {
     }
 
     setupEventListeners() {
-        // 네비게이션
+        // ?�비게이??
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
                 const page = e.target.dataset.page;
@@ -151,12 +151,12 @@ class UI {
             });
         });
 
-        // 새 예약 버튼
+        // ???�약 버튼
         document.getElementById('new-booking-btn').addEventListener('click', () => {
             this.openBookingModal();
         });
 
-        // 필터
+        // ?�터
         document.getElementById('filter-date').addEventListener('change', () => {
             this.renderBookings();
         });
@@ -164,7 +164,7 @@ class UI {
             this.renderBookings();
         });
 
-        // 달력 네비게이션
+        // ?�력 ?�비게이??
         document.getElementById('prev-month').addEventListener('click', () => {
             this.currentMonth--;
             if (this.currentMonth < 0) {
@@ -197,7 +197,7 @@ class UI {
             this.renderBookings();
         } else if (page === 'calendar') {
             this.renderCalendar();
-        } else if (page === 'rooms') {
+        } else if (page === 'calendar') {
             this.renderRooms();
             this.renderZoomAccount();
         }
@@ -214,10 +214,10 @@ class UI {
                 <h3>${room.name}</h3>
                 <div class="room-info">
                     <div class="room-info-item">
-                        <strong>위치:</strong> ${room.location}
+                        <strong>?�치:</strong> ${room.location}
                     </div>
                     <div class="room-info-item">
-                        <strong>수용인원:</strong> ${room.capacity}명
+                        <strong>?�용?�원:</strong> ${room.capacity}�?
                     </div>
                 </div>
                 <div class="facilities">
@@ -229,7 +229,7 @@ class UI {
             bookBtn.className = 'btn-primary';
             bookBtn.style.marginTop = '16px';
             bookBtn.style.width = '100%';
-            bookBtn.textContent = '예약하기';
+            bookBtn.textContent = '?�약?�기';
             bookBtn.addEventListener('click', () => {
                 this.openBookingModal(room.id);
             });
@@ -245,22 +245,22 @@ class UI {
         
         grid.innerHTML = '';
 
-        // 줌 계정 카드 추가
+        // �?계정 카드 추�?
         const zoomCard = document.createElement('div');
         zoomCard.className = 'room-card';
         zoomCard.innerHTML = `
-            <h3>📹 줌 예약</h3>
+            <h3>?�� �??�약</h3>
             <div class="room-info">
                 <div class="room-info-item">
-                    <strong>타입:</strong> 화상회의 계정
+                    <strong>?�??</strong> ?�상?�의 계정
                 </div>
                 <div class="room-info-item">
-                    <strong>용도:</strong> 온라인 회의
+                    <strong>?�도:</strong> ?�라???�의
                 </div>
             </div>
             <div class="facilities">
-                <span class="facility-tag">화상회의</span>
-                <span class="facility-tag">녹화 가능</span>
+                <span class="facility-tag">?�상?�의</span>
+                <span class="facility-tag">?�화 가??/span>
             </div>
         `;
         
@@ -268,7 +268,7 @@ class UI {
         zoomBookBtn.className = 'btn-primary';
         zoomBookBtn.style.marginTop = '16px';
         zoomBookBtn.style.width = '100%';
-        zoomBookBtn.textContent = '줌 예약';
+        zoomBookBtn.textContent = '�??�약';
         zoomBookBtn.addEventListener('click', () => {
             this.openZoomBookingModal();
         });
@@ -281,31 +281,31 @@ class UI {
         const list = document.getElementById('bookings-list');
         list.innerHTML = '';
 
-        // 회의실 예약과 줌 예약을 합치기
+        // ?�의???�약�?�??�약???�치�?
         let allBookings = [
             ...this.dataManager.bookings.map(b => ({...b, isZoom: false})),
             ...this.dataManager.zoomBookings.map(b => ({...b, isZoom: true}))
         ];
         
-        // 날짜 필터
+        // ?�짜 ?�터
         const dateFilter = document.getElementById('filter-date').value;
         if (dateFilter) {
             allBookings = allBookings.filter(b => b.date === dateFilter);
         }
 
-        // 회의실 필터 (줌 예약은 필터에서 제외)
+        // ?�의???�터 (�??�약?� ?�터?�서 ?�외)
         const roomFilter = document.getElementById('filter-room').value;
         if (roomFilter) {
             allBookings = allBookings.filter(b => {
-                if (b.isZoom) return false; // 줌 예약은 회의실 필터에서 제외
+                if (b.isZoom) return false; // �??�약?� ?�의???�터?�서 ?�외
                 return b.roomId === parseInt(roomFilter);
             });
         }
 
-        // 회의실 필터 옵션 업데이트
+        // ?�의???�터 ?�션 ?�데?�트
         this.updateRoomFilterOptions();
 
-        // 날짜순 정렬
+        // ?�짜???�렬
         allBookings.sort((a, b) => {
             if (a.date !== b.date) return a.date.localeCompare(b.date);
             return a.startTime.localeCompare(b.startTime);
@@ -314,9 +314,9 @@ class UI {
         if (allBookings.length === 0) {
             list.innerHTML = `
                 <div class="empty-state">
-                    <div class="empty-state-icon">📅</div>
-                    <h3>예약이 없습니다</h3>
-                    <p>새로운 예약을 만들어보세요!</p>
+                    <div class="empty-state-icon">?��</div>
+                    <h3>?�약???�습?�다</h3>
+                    <p>?�로???�약??만들?�보?�요!</p>
                 </div>
             `;
             return;
@@ -327,38 +327,38 @@ class UI {
             card.className = 'booking-card';
             
             if (booking.isZoom) {
-                // 줌 예약 카드
+                // �??�약 카드
                 card.innerHTML = `
                     <div class="booking-info">
-                        <h3>📹 줌 예약</h3>
+                        <h3>?�� �??�약</h3>
                         <div class="booking-details">
-                            <div><strong>날짜:</strong> ${this.formatDate(booking.date)}</div>
-                            <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
-                            <div><strong>예약자:</strong> ${booking.userName}</div>
-                            ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                            <div><strong>?�짜:</strong> ${this.formatDate(booking.date)}</div>
+                            <div><strong>?�간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                            <div><strong>?�약??</strong> ${booking.userName}</div>
+                            ${booking.attendees ? `<div><strong>참석??</strong> ${booking.attendees}</div>` : ''}
                             ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
-                            ${booking.roomName ? `<div><strong>회의실:</strong> ${booking.roomName}</div>` : ''}
+                            ${booking.roomName ? `<div><strong>?�의??</strong> ${booking.roomName}</div>` : ''}
                         </div>
                     </div>
                     <button class="btn-danger" data-zoom-booking-id="${booking.id}">취소</button>
                 `;
                 
                 card.querySelector('.btn-danger').addEventListener('click', () => {
-                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                    if (confirm('?�말 ?�약??취소?�시겠습?�까?')) {
                         this.cancelZoomBooking(booking.id);
                     }
                 });
             } else {
-                // 회의실 예약 카드
+                // ?�의???�약 카드
                 const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
                 card.innerHTML = `
                     <div class="booking-info">
                         <h3>${booking.roomName}</h3>
                         <div class="booking-details">
-                            <div><strong>날짜:</strong> ${this.formatDate(booking.date)}</div>
-                            <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
-                            <div><strong>예약자:</strong> ${booking.userName}</div>
-                            ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                            <div><strong>?�짜:</strong> ${this.formatDate(booking.date)}</div>
+                            <div><strong>?�간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                            <div><strong>?�약??</strong> ${booking.userName}</div>
+                            ${booking.attendees ? `<div><strong>참석??</strong> ${booking.attendees}</div>` : ''}
                             ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
                         </div>
                     </div>
@@ -366,7 +366,7 @@ class UI {
                 `;
                 
                 card.querySelector('.btn-danger').addEventListener('click', () => {
-                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                    if (confirm('?�말 ?�약??취소?�시겠습?�까?')) {
                         this.cancelBooking(booking.id);
                     }
                 });
@@ -379,7 +379,7 @@ class UI {
     updateRoomFilterOptions() {
         const select = document.getElementById('filter-room');
         const currentValue = select.value;
-        select.innerHTML = '<option value="">전체 회의실</option>';
+        select.innerHTML = '<option value="">?�체 ?�의??/option>';
         
         this.dataManager.rooms.forEach(room => {
             const option = document.createElement('option');
@@ -408,14 +408,14 @@ class UI {
             this.submitBooking();
         });
 
-        // 날짜 기본값을 오늘로 설정
+        // ?�짜 기본값을 ?�늘�??�정
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').setAttribute('min', today);
 
-        // 시간 선택 드롭다운 초기화
+        // ?�간 ?�택 ?�롭?�운 초기??
         this.initTimeSelects();
 
-        // 시간 선택 시 hidden input 업데이트
+        // ?�간 ?�택 ??hidden input ?�데?�트
         document.getElementById('booking-start-hour').addEventListener('change', () => {
             this.updateTimeInput('start');
         });
@@ -431,23 +431,23 @@ class UI {
     }
 
     initTimeSelects() {
-        // 시간 옵션 (0-23)
+        // ?�간 ?�션 (0-23)
         const startHourSelect = document.getElementById('booking-start-hour');
         const endHourSelect = document.getElementById('booking-end-hour');
         
         for (let i = 0; i < 24; i++) {
             const option1 = document.createElement('option');
             option1.value = String(i).padStart(2, '0');
-            option1.textContent = `${i}시`;
+            option1.textContent = `${i}??;
             startHourSelect.appendChild(option1);
 
             const option2 = document.createElement('option');
             option2.value = String(i).padStart(2, '0');
-            option2.textContent = `${i}시`;
+            option2.textContent = `${i}??;
             endHourSelect.appendChild(option2);
         }
 
-        // 분 옵션 (0, 10, 20, 30, 40, 50)
+        // �??�션 (0, 10, 20, 30, 40, 50)
         const startMinuteSelect = document.getElementById('booking-start-minute');
         const endMinuteSelect = document.getElementById('booking-end-minute');
         
@@ -455,12 +455,12 @@ class UI {
         minutes.forEach(min => {
             const option1 = document.createElement('option');
             option1.value = String(min).padStart(2, '0');
-            option1.textContent = `${min}분`;
+            option1.textContent = `${min}�?;
             startMinuteSelect.appendChild(option1);
 
             const option2 = document.createElement('option');
             option2.value = String(min).padStart(2, '0');
-            option2.textContent = `${min}분`;
+            option2.textContent = `${min}�?;
             endMinuteSelect.appendChild(option2);
         });
     }
@@ -485,16 +485,16 @@ class UI {
         const form = document.getElementById('booking-form');
         form.reset();
 
-        // 모달 제목 변경
-        document.querySelector('#booking-modal .modal-header h2').textContent = '회의실 예약';
+        // 모달 ?�목 변�?
+        document.querySelector('#booking-modal .modal-header h2').textContent = '?�의???�약';
 
-        // 회의실 선택 표시
+        // ?�의???�택 ?�시
         document.getElementById('booking-room').closest('.form-group').style.display = 'block';
         document.getElementById('booking-room').setAttribute('required', 'required');
 
-        // 회의실 선택 옵션 채우기
+        // ?�의???�택 ?�션 채우�?
         const roomSelect = document.getElementById('booking-room');
-        roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
+        roomSelect.innerHTML = '<option value="">?�의?�을 ?�택?�세??/option>';
         this.dataManager.rooms.forEach(room => {
             const option = document.createElement('option');
             option.value = room.id;
@@ -505,11 +505,11 @@ class UI {
             roomSelect.appendChild(option);
         });
 
-        // 날짜 기본값
+        // ?�짜 기본�?
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').value = today;
 
-        // 시간 선택 초기화
+        // ?�간 ?�택 초기??
         document.getElementById('booking-start-hour').value = '';
         document.getElementById('booking-start-minute').value = '';
         document.getElementById('booking-end-hour').value = '';
@@ -526,18 +526,18 @@ class UI {
         const form = document.getElementById('booking-form');
         form.reset();
 
-        // 모달 제목 변경
-        document.querySelector('#booking-modal .modal-header h2').textContent = '줌 예약';
+        // 모달 ?�목 변�?
+        document.querySelector('#booking-modal .modal-header h2').textContent = '�??�약';
 
-        // 회의실 선택 숨기기
+        // ?�의???�택 ?�기�?
         document.getElementById('booking-room').closest('.form-group').style.display = 'none';
         document.getElementById('booking-room').removeAttribute('required');
 
-        // 날짜 기본값
+        // ?�짜 기본�?
         const today = new Date().toISOString().split('T')[0];
         document.getElementById('booking-date').value = today;
 
-        // 시간 선택 초기화
+        // ?�간 ?�택 초기??
         document.getElementById('booking-start-hour').value = '';
         document.getElementById('booking-start-minute').value = '';
         document.getElementById('booking-end-hour').value = '';
@@ -551,23 +551,23 @@ class UI {
 
     closeBookingModal() {
         document.getElementById('booking-modal').classList.remove('active');
-        // 회의실 선택 다시 표시
+        // ?�의???�택 ?�시 ?�시
         document.getElementById('booking-room').closest('.form-group').style.display = 'block';
     }
 
     submitBooking() {
-        // 시간 입력 확인 (드롭다운에서 직접 확인)
+        // ?�간 ?�력 ?�인 (?�롭?�운?�서 직접 ?�인)
         const startHour = document.getElementById('booking-start-hour').value;
         const startMinute = document.getElementById('booking-start-minute').value;
         const endHour = document.getElementById('booking-end-hour').value;
         const endMinute = document.getElementById('booking-end-minute').value;
 
         if (!startHour || !startMinute || !endHour || !endMinute) {
-            this.showNotification('시작 시간과 종료 시간을 모두 선택해주세요.', 'error');
+            this.showNotification('?�작 ?�간�?종료 ?�간??모두 ?�택?�주?�요.', 'error');
             return;
         }
 
-        // hidden input 업데이트
+        // hidden input ?�데?�트
         const startTime = `${startHour}:${startMinute}`;
         const endTime = `${endHour}:${endMinute}`;
         document.getElementById('booking-start').value = startTime;
@@ -578,19 +578,19 @@ class UI {
         const purpose = document.getElementById('booking-purpose').value;
         const attendees = document.getElementById('booking-attendees').value;
 
-        // 유효성 검사
+        // ?�효??검??
         if (startTime >= endTime) {
-            this.showNotification('종료 시간은 시작 시간보다 늦어야 합니다.', 'error');
+            this.showNotification('종료 ?�간?� ?�작 ?�간보다 ??��???�니??', 'error');
             return;
         }
 
-        // 줌 전용 예약인지 확인
+        // �??�용 ?�약?��? ?�인
         const isZoomOnly = document.getElementById('booking-room').closest('.form-group').style.display === 'none';
 
         if (isZoomOnly) {
-            // 줌 전용 예약
+            // �??�용 ?�약
             if (!this.dataManager.isZoomTimeSlotAvailable(date, startTime, endTime)) {
-                this.showNotification('해당 시간에 줌 예약이 이미 있습니다.', 'error');
+                this.showNotification('?�당 ?�간??�??�약???��? ?�습?�다.', 'error');
                 return;
             }
 
@@ -608,16 +608,16 @@ class UI {
             this.renderZoomAccount();
             this.renderBookings();
             this.renderCalendar();
-            this.showNotification('줌 예약이 완료되었습니다!');
+            this.showNotification('�??�약???�료?�었?�니??');
             return;
         }
 
-        // 회의실 예약
+        // ?�의???�약
         const roomId = parseInt(document.getElementById('booking-room').value);
         
-        // 시간 충돌 확인
+        // ?�간 충돌 ?�인
         if (!this.dataManager.isTimeSlotAvailable(roomId, date, startTime, endTime)) {
-            this.showNotification('해당 시간에 이미 예약이 있습니다. 다른 시간을 선택해주세요.', 'error');
+            this.showNotification('?�당 ?�간???��? ?�약???�습?�다. ?�른 ?�간???�택?�주?�요.', 'error');
             return;
         }
 
@@ -642,26 +642,26 @@ class UI {
         this.renderZoomAccount();
         this.renderBookings();
         this.renderCalendar();
-        this.showNotification('예약이 완료되었습니다!');
+        this.showNotification('?�약???�료?�었?�니??');
     }
 
     cancelBooking(bookingId) {
         this.dataManager.deleteBooking(bookingId);
         this.renderBookings();
         this.renderCalendar();
-        this.showNotification('예약이 취소되었습니다.');
+        this.showNotification('?�약??취소?�었?�니??');
     }
 
     cancelZoomBooking(bookingId) {
         this.dataManager.deleteZoomBooking(bookingId);
         this.renderBookings();
         this.renderCalendar();
-        this.showNotification('줌 예약이 취소되었습니다.');
+        this.showNotification('�??�약??취소?�었?�니??');
     }
 
     formatDate(dateString) {
         const date = new Date(dateString);
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        const weekdays = ['??, '??, '??, '??, '�?, '�?, '??];
         const year = date.getFullYear();
         const month = String(date.getMonth() + 1).padStart(2, '0');
         const day = String(date.getDate()).padStart(2, '0');
@@ -683,16 +683,16 @@ class UI {
         const grid = document.getElementById('calendar-grid');
         const monthYearEl = document.getElementById('current-month-year');
         
-        // 월/년도 표시
-        const monthNames = ['1월', '2월', '3월', '4월', '5월', '6월', 
-                           '7월', '8월', '9월', '10월', '11월', '12월'];
-        monthYearEl.textContent = `${this.currentYear}년 ${monthNames[this.currentMonth]}`;
+        // ???�도 ?�시
+        const monthNames = ['1??, '2??, '3??, '4??, '5??, '6??, 
+                           '7??, '8??, '9??, '10??, '11??, '12??];
+        monthYearEl.textContent = `${this.currentYear}??${monthNames[this.currentMonth]}`;
 
-        // 달력 그리드 초기화
+        // ?�력 그리??초기??
         grid.innerHTML = '';
 
-        // 요일 헤더
-        const weekdays = ['일', '월', '화', '수', '목', '금', '토'];
+        // ?�일 ?�더
+        const weekdays = ['??, '??, '??, '??, '�?, '�?, '??];
         weekdays.forEach(day => {
             const dayHeader = document.createElement('div');
             dayHeader.className = 'calendar-day-header';
@@ -700,13 +700,13 @@ class UI {
             grid.appendChild(dayHeader);
         });
 
-        // 첫 날짜와 마지막 날짜 계산
+        // �??�짜?� 마�?�??�짜 계산
         const firstDay = new Date(this.currentYear, this.currentMonth, 1);
         const lastDay = new Date(this.currentYear, this.currentMonth + 1, 0);
         const startDate = new Date(firstDay);
         startDate.setDate(startDate.getDate() - startDate.getDay());
 
-        // 6주 표시 (42일)
+        // 6�??�시 (42??
         const today = new Date();
         today.setHours(0, 0, 0, 0);
 
@@ -717,12 +717,12 @@ class UI {
             const dayCell = document.createElement('div');
             dayCell.className = 'calendar-day';
             
-            // 다른 월의 날짜는 회색으로
+            // ?�른 ?�의 ?�짜???�색?�로
             if (currentDate.getMonth() !== this.currentMonth) {
                 dayCell.classList.add('other-month');
             }
             
-            // 오늘 날짜 강조
+            // ?�늘 ?�짜 강조
             if (currentDate.getTime() === today.getTime()) {
                 dayCell.classList.add('today');
             }
@@ -732,25 +732,25 @@ class UI {
             dayNumber.textContent = currentDate.getDate();
             dayCell.appendChild(dayNumber);
 
-            // 해당 날짜의 예약 목록 가져오기
+            // ?�당 ?�짜???�약 목록 가?�오�?
             const dateStr = this.formatDateForCalendar(currentDate);
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
             const dayZoomBookings = this.dataManager.zoomBookings.filter(b => b.date === dateStr);
             
-            // 모든 예약 합치기
+            // 모든 ?�약 ?�치�?
             const allBookings = [...dayBookings, ...dayZoomBookings.map(b => ({...b, isZoom: true}))];
             
-            // 시간순으로 정렬
+            // ?�간?�으�??�렬
             allBookings.sort((a, b) => a.startTime.localeCompare(b.startTime));
 
-            // 예약 이벤트 표시
+            // ?�약 ?�벤???�시
             allBookings.forEach(booking => {
                 const event = document.createElement('div');
                 event.className = 'calendar-event';
                 
                 const roomName = document.createElement('span');
                 roomName.className = 'event-room';
-                roomName.textContent = booking.isZoom ? '📹 줌 예약' : (booking.roomName || '');
+                roomName.textContent = booking.isZoom ? '?�� �??�약' : (booking.roomName || '');
                 
                 const time = document.createElement('span');
                 time.className = 'event-time';
@@ -759,7 +759,7 @@ class UI {
                 event.appendChild(roomName);
                 event.appendChild(time);
                 
-                // 클릭 시 상세 정보 표시 및 취소 옵션
+                // ?�릭 ???�세 ?�보 ?�시 �?취소 ?�션
                 event.addEventListener('click', (e) => {
                     e.stopPropagation();
                     this.showBookingDetails(booking);
@@ -780,51 +780,51 @@ class UI {
     }
 
     formatTime(timeStr) {
-        // "09:30" -> "9시 30분"
+        // "09:30" -> "9??30�?
         const [hours, minutes] = timeStr.split(':');
         const hour = parseInt(hours);
         const min = parseInt(minutes);
         if (min === 0) {
-            return `${hour}시`;
+            return `${hour}??;
         }
-        return `${hour}시 ${min}분`;
+        return `${hour}??${min}�?;
     }
 
     showBookingDetails(booking) {
         let details = '';
         if (booking.isZoom) {
             details = `
-줌 예약
-날짜: ${this.formatDate(booking.date)}
-시간: ${booking.startTime} ~ ${booking.endTime}
-예약자: ${booking.userName}
-${booking.attendees ? `참석자: ${booking.attendees}` : ''}
+�??�약
+?�짜: ${this.formatDate(booking.date)}
+?�간: ${booking.startTime} ~ ${booking.endTime}
+?�약?? ${booking.userName}
+${booking.attendees ? `참석?? ${booking.attendees}` : ''}
 ${booking.purpose ? `목적: ${booking.purpose}` : ''}
-${booking.roomName ? `회의실: ${booking.roomName}` : ''}
+${booking.roomName ? `?�의?? ${booking.roomName}` : ''}
             `.trim();
             
-            if (confirm(details + '\n\n예약을 취소하시겠습니까?')) {
+            if (confirm(details + '\n\n?�약??취소?�시겠습?�까?')) {
                 this.cancelZoomBooking(booking.id);
             }
         } else {
             const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
             details = `
-회의실: ${booking.roomName}
-날짜: ${this.formatDate(booking.date)}
-시간: ${booking.startTime} ~ ${booking.endTime}
-예약자: ${booking.userName}
-${booking.attendees ? `참석자: ${booking.attendees}` : ''}
+?�의?? ${booking.roomName}
+?�짜: ${this.formatDate(booking.date)}
+?�간: ${booking.startTime} ~ ${booking.endTime}
+?�약?? ${booking.userName}
+${booking.attendees ? `참석?? ${booking.attendees}` : ''}
 ${booking.purpose ? `목적: ${booking.purpose}` : ''}
             `.trim();
             
-            if (confirm(details + '\n\n예약을 취소하시겠습니까?')) {
+            if (confirm(details + '\n\n?�약??취소?�시겠습?�까?')) {
                 this.cancelBooking(booking.id);
             }
         }
     }
 }
 
-// 앱 초기화
+// ??초기??
 document.addEventListener('DOMContentLoaded', () => {
     const dataManager = new DataManager();
     const ui = new UI(dataManager);
