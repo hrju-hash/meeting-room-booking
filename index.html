@@ -10,49 +10,31 @@
     <div class="container">
         <header>
             <div class="header-content">
-                <img src="logo.png" alt="로고" class="logo" onerror="this.style.display='none'">
+                <img src="logo.svg" alt="로고" class="logo" onerror="this.style.display='none'">
                 <h1>맑은스페이스</h1>
             </div>
-            <nav>
-                <button class="nav-btn active" data-page="rooms">목록</button>
-                <button class="nav-btn" data-page="calendar">예약 현황</button>
-                <button class="nav-btn" data-page="bookings">내 예약</button>
-            </nav>
+                <nav>
+                    <button class="nav-btn active" data-page="calendar">목록</button>
+                    <button class="nav-btn" data-page="bookings">내 예약</button>
+                </nav>
         </header>
 
-        <!-- 회의실 목록 페이지 -->
-        <section id="rooms-page" class="page active">
-            <div class="page-header">
-                <h2>회의실 목록</h2>
-                <button class="btn-primary" id="new-booking-btn">새 예약하기</button>
-            </div>
-            <div class="rooms-grid" id="rooms-grid">
-                <!-- 회의실 카드들이 여기에 동적으로 추가됩니다 -->
-            </div>
-            <div class="page-header" style="margin-top: 40px;">
-                <h2>줌 예약</h2>
-            </div>
-            <div class="rooms-grid" id="zoom-grid">
-                <!-- 줌 계정 카드가 여기에 동적으로 추가됩니다 -->
-            </div>
-        </section>
-
-        <!-- 달력 페이지 -->
-        <section id="calendar-page" class="page">
-            <div class="page-header">
-                <h2>예약 현황</h2>
-                <div class="calendar-controls">
-                    <button class="btn-secondary" id="prev-month">◀ 이전</button>
-                    <span id="current-month-year" class="month-year"></span>
-                    <button class="btn-secondary" id="next-month">다음 ▶</button>
+            <!-- 목록 페이지 (달력) -->
+            <section id="calendar-page" class="page active">
+                <div class="page-header">
+                    <h2>예약하기</h2>
+                    <div class="calendar-controls">
+                        <button class="btn-secondary" id="prev-month">◀ 이전</button>
+                        <span id="current-month-year" class="month-year"></span>
+                        <button class="btn-secondary" id="next-month">다음 ▶</button>
+                    </div>
                 </div>
-            </div>
-            <div class="calendar-container">
-                <div class="calendar-grid" id="calendar-grid">
-                    <!-- 달력이 여기에 동적으로 추가됩니다 -->
+                <div class="calendar-container">
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- 달력이 여기에 동적으로 추가됩니다 -->
+                    </div>
                 </div>
-            </div>
-        </section>
+            </section>
 
         <!-- 예약 목록 페이지 -->
         <section id="bookings-page" class="page">
