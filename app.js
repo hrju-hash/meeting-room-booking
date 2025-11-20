@@ -482,36 +482,28 @@ class UI {
             bookBtn.style.marginTop = '16px';
             bookBtn.style.width = '100%';
             bookBtn.textContent = '예약하기';
-            bookBtn.type = 'button'; // 폼 제출 방지
-            bookBtn.style.cursor = 'pointer';
-            bookBtn.style.pointerEvents = 'auto';
-            bookBtn.style.zIndex = '10';
-            bookBtn.style.position = 'relative';
+            bookBtn.type = 'button';
+            bookBtn.setAttribute('data-room-id', room.id);
+            bookBtn.setAttribute('data-room-name', room.name);
             
-            // 클릭 이벤트 강화
-            bookBtn.addEventListener('click', (e) => {
+            // 가장 간단하고 확실한 클릭 이벤트
+            bookBtn.onclick = (e) => {
                 e.preventDefault();
                 e.stopPropagation();
-                console.log('예약하기 버튼 클릭:', room.id, room.name);
-                try {
-                    this.openBookingModal(room.id);
-                } catch (error) {
-                    console.error('모달 열기 오류:', error);
-                    alert('예약 모달을 열 수 없습니다. 콘솔을 확인해주세요.');
-                }
-            });
-            
-            // 터치 이벤트도 지원 (모바일)
-            bookBtn.addEventListener('touchstart', (e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                console.log('예약하기 버튼 터치:', room.id, room.name);
-                try {
-                    this.openBookingModal(room.id);
-                } catch (error) {
-                    console.error('모달 열기 오류:', error);
-                }
-            });
+                const roomId = parseInt(bookBtn.getAttribute('data-room-id'));
+                const roomName = bookBtn.getAttribute('data-room-name');
+                console.log('예약하기 버튼 클릭 (onclick):', roomId, roomName);
+                
+                // 즉시 모달 열기 시도
+                setTimeout(() => {
+                    try {
+                        this.openBookingModal(roomId);
+                    } catch (error) {
+                        console.error('모달 열기 오류:', error);
+                        alert('예약 모달을 열 수 없습니다: ' + error.message);
+                    }
+                }, 0);
+            };
             
             card.appendChild(bookBtn);
             
@@ -550,34 +542,22 @@ class UI {
         zoomBookBtn.style.width = '100%';
         zoomBookBtn.textContent = '줌 예약';
         zoomBookBtn.type = 'button';
-        zoomBookBtn.style.cursor = 'pointer';
-        zoomBookBtn.style.pointerEvents = 'auto';
-        zoomBookBtn.style.zIndex = '10';
-        zoomBookBtn.style.position = 'relative';
         
-        zoomBookBtn.addEventListener('click', (e) => {
+        // 가장 간단하고 확실한 클릭 이벤트
+        zoomBookBtn.onclick = (e) => {
             e.preventDefault();
             e.stopPropagation();
-            console.log('줌 예약 버튼 클릭');
-            try {
-                this.openZoomBookingModal();
-            } catch (error) {
-                console.error('줌 모달 열기 오류:', error);
-                alert('줌 예약 모달을 열 수 없습니다. 콘솔을 확인해주세요.');
-            }
-        });
-        
-        // 터치 이벤트도 지원
-        zoomBookBtn.addEventListener('touchstart', (e) => {
-            e.preventDefault();
-            e.stopPropagation();
-            console.log('줌 예약 버튼 터치');
-            try {
-                this.openZoomBookingModal();
-            } catch (error) {
-                console.error('줌 모달 열기 오류:', error);
-            }
-        });
+            console.log('줌 예약 버튼 클릭 (onclick)');
+            
+            setTimeout(() => {
+                try {
+                    this.openZoomBookingModal();
+                } catch (error) {
+                    console.error('줌 모달 열기 오류:', error);
+                    alert('줌 예약 모달을 열 수 없습니다: ' + error.message);
+                }
+            }, 0);
+        };
         
         zoomCard.appendChild(zoomBookBtn);
         
@@ -844,19 +824,26 @@ class UI {
     }
 
     openBookingModal(roomId = null) {
-        console.log('openBookingModal 호출:', roomId);
+        console.log('=== openBookingModal 시작 ===', roomId);
+        
+        // 모달 요소 확인
         const modal = document.getElementById('booking-modal');
         if (!modal) {
-            console.error('booking-modal 요소를 찾을 수 없습니다!');
+            console.error('❌ booking-modal 요소를 찾을 수 없습니다!');
             alert('예약 모달을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
             return;
         }
+        console.log('✅ 모달 요소 찾음:', modal);
         
+        // 폼 요소 확인
         const form = document.getElementById('booking-form');
         if (!form) {
-            console.error('booking-form 요소를 찾을 수 없습니다!');
+            console.error('❌ booking-form 요소를 찾을 수 없습니다!');
+            alert('예약 폼을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
             return;
         }
+        console.log('✅ 폼 요소 찾음:', form);
+        
         form.reset();
 
         // 모달 제목 변경
