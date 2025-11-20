@@ -395,6 +395,7 @@ class UI {
             });
             this.dataManager.setOnRoomsUpdate(() => {
                 this.renderRooms();
+                this.renderZoomAccount();
             });
             
             // Firebase 초기화 후 데이터 로드 대기
@@ -551,7 +552,18 @@ class UI {
     renderRooms() {
         const grid = document.getElementById('rooms-grid');
         if (!grid) return; // rooms-grid가 없으면 종료
-        grid.innerHTML = '';
+        
+        // 줌 카드를 제외하고 회의실 카드만 제거
+        const zoomCard = grid.querySelector('[data-zoom-card]');
+        const roomCards = grid.querySelectorAll('.room-card:not([data-zoom-card])');
+        roomCards.forEach(card => card.remove());
+        
+        // 줌 카드가 있으면 임시로 저장했다가 나중에 다시 추가
+        let zoomCardElement = null;
+        if (zoomCard) {
+            zoomCardElement = zoomCard.cloneNode(true);
+            zoomCard.remove();
+        }
 
         this.dataManager.rooms.forEach(room => {
             const card = document.createElement('div');
@@ -644,6 +656,27 @@ class UI {
             
             grid.appendChild(card);
         });
+        
+        // 줌 카드가 있었으면 다시 추가
+        if (zoomCardElement) {
+            grid.appendChild(zoomCardElement);
+            // 이벤트 리스너 다시 연결
+            const zoomBtn = zoomCardElement.querySelector('.btn-primary');
+            if (zoomBtn) {
+                const self = this;
+                zoomBtn.onclick = function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    try {
+                        self.openZoomBookingModal();
+                    } catch (error) {
+                        console.error('줌 모달 열기 오류:', error);
+                        alert('줌 예약 모달을 열 수 없습니다: ' + error.message);
+                    }
+                    return false;
+                };
+            }
+        }
     }
 
     renderZoomAccount() {
