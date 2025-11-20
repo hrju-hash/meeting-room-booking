@@ -580,10 +580,25 @@ class UI {
         
         console.log('합쳐진 예약 목록:', allBookings.length, '개', allBookings);
         
-        // 날짜 필터
+        // 날짜 필터 (날짜 형식 정규화)
         const dateFilter = document.getElementById('filter-date').value;
         if (dateFilter) {
-            allBookings = allBookings.filter(b => b.date === dateFilter);
+            const normalizedFilter = dateFilter.trim();
+            allBookings = allBookings.filter(b => {
+                const bookingDate = b.date ? b.date.trim() : '';
+                return bookingDate === normalizedFilter;
+            });
+            console.log('날짜 필터 적용:', normalizedFilter, '->', allBookings.length, '개');
+        }
+        
+        // 2025-11-24 날짜 확인
+        const testDate = '2025-11-24';
+        const testBookings = allBookings.filter(b => {
+            const bookingDate = b.date ? b.date.trim() : '';
+            return bookingDate === testDate;
+        });
+        if (testBookings.length > 0) {
+            console.log('2025-11-24 예약 발견:', testBookings.length, '개', testBookings);
         }
 
         // 회의실 필터 (줌 예약은 필터에서 제외)
@@ -1367,8 +1382,51 @@ class UI {
             dayCell.appendChild(dayNumberContainer);
 
             // 해당 날짜의 예약 목록 가져오기
-            const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
-            const dayZoomBookings = this.dataManager.zoomBookings.filter(b => b.date === dateStr);
+            // LocalStorage 폴백도 확인
+            let bookings = this.dataManager.bookings || [];
+            let zoomBookings = this.dataManager.zoomBookings || [];
+            
+            if (!this.dataManager.db || bookings.length === 0) {
+                const localBookings = this.dataManager.loadBookingsFromLocal();
+                if (localBookings.length > 0) {
+                    bookings = localBookings;
+                }
+            }
+            
+            if (!this.dataManager.db || zoomBookings.length === 0) {
+                const localZoomBookings = this.dataManager.loadZoomBookingsFromLocal();
+                if (localZoomBookings.length > 0) {
+                    zoomBookings = localZoomBookings;
+                }
+            }
+            
+            // 날짜 형식 정규화 (YYYY-MM-DD)
+            const normalizedDateStr = dateStr;
+            
+            const dayBookings = bookings.filter(b => {
+                // 날짜 형식 정규화
+                const bookingDate = b.date ? b.date.trim() : '';
+                return bookingDate === normalizedDateStr;
+            });
+            
+            const dayZoomBookings = zoomBookings.filter(b => {
+                // 날짜 형식 정규화
+                const bookingDate = b.date ? b.date.trim() : '';
+                return bookingDate === normalizedDateStr;
+            });
+            
+            // 디버깅: 2025-11-24 날짜 확인
+            if (normalizedDateStr === '2025-11-24') {
+                console.log('2025-11-24 예약 확인:', {
+                    dateStr: normalizedDateStr,
+                    allBookings: bookings.length,
+                    allZoomBookings: zoomBookings.length,
+                    dayBookings: dayBookings.length,
+                    dayZoomBookings: dayZoomBookings.length,
+                    dayBookingsData: dayBookings,
+                    dayZoomBookingsData: dayZoomBookings
+                });
+            }
             
             // 모든 예약 합치기
             const allBookings = [...dayBookings, ...dayZoomBookings.map(b => ({...b, isZoom: true}))];
