@@ -1,0 +1,13 @@
+<svg width="48" height="48" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg">
+  <!-- 파란색 원 배경 -->
+  <circle cx="24" cy="24" r="24" fill="#2563eb"/>
+  
+  <!-- 흰색 m 글자 (둥근 상단, 평평한 하단 스타일) -->
+  <text x="24" y="34" font-family="Arial, sans-serif" font-size="32" font-weight="bold" fill="white" text-anchor="middle" style="font-style: normal; letter-spacing: 0;">m</text>
+  
+  <!-- 우측 상단 작은 흰색 원 -->
+  <circle cx="36" cy="12" r="6" fill="white"/>
+  
+  <!-- 작은 원 안의 TM 텍스트 (파란색) -->
+  <text x="36" y="15" font-family="Arial, sans-serif" font-size="7" font-weight="bold" fill="#2563eb" text-anchor="middle">TM</text>
+</svg>
