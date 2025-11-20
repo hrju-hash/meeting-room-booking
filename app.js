@@ -531,25 +531,51 @@ class UI {
 
     renderBookings() {
         const list = document.getElementById('bookings-list');
-        if (!list) return; // bookings-list 요소가 없으면 종료
+        if (!list) {
+            console.warn('bookings-list 요소를 찾을 수 없습니다!');
+            return; // bookings-list 요소가 없으면 종료
+        }
         
+        console.log('=== renderBookings 시작 ===');
         list.innerHTML = '';
 
-        // 데이터 확인
-        const bookingsCount = (this.dataManager.bookings || []).length;
-        const zoomBookingsCount = (this.dataManager.zoomBookings || []).length;
-        console.log('renderBookings 호출:', {
+        // 데이터 확인 - LocalStorage 폴백도 확인
+        let bookings = this.dataManager.bookings || [];
+        let zoomBookings = this.dataManager.zoomBookings || [];
+        
+        // Firebase가 없거나 데이터가 비어있으면 LocalStorage에서 로드
+        if (!this.dataManager.db || bookings.length === 0) {
+            const localBookings = this.dataManager.loadBookingsFromLocal();
+            if (localBookings.length > 0) {
+                console.log('LocalStorage에서 bookings 로드:', localBookings.length, '개');
+                bookings = localBookings;
+            }
+        }
+        
+        if (!this.dataManager.db || zoomBookings.length === 0) {
+            const localZoomBookings = this.dataManager.loadZoomBookingsFromLocal();
+            if (localZoomBookings.length > 0) {
+                console.log('LocalStorage에서 zoomBookings 로드:', localZoomBookings.length, '개');
+                zoomBookings = localZoomBookings;
+            }
+        }
+        
+        const bookingsCount = bookings.length;
+        const zoomBookingsCount = zoomBookings.length;
+        
+        console.log('renderBookings 데이터:', {
             bookings: bookingsCount,
             zoomBookings: zoomBookingsCount,
             total: bookingsCount + zoomBookingsCount,
-            bookingsData: this.dataManager.bookings,
-            zoomBookingsData: this.dataManager.zoomBookings
+            bookingsData: bookings,
+            zoomBookingsData: zoomBookings,
+            hasFirebase: !!this.dataManager.db
         });
 
         // 회의실 예약과 줌 예약을 합치기
         let allBookings = [
-            ...(this.dataManager.bookings || []).map(b => ({...b, isZoom: false})),
-            ...(this.dataManager.zoomBookings || []).map(b => ({...b, isZoom: true}))
+            ...bookings.map(b => ({...b, isZoom: false})),
+            ...zoomBookings.map(b => ({...b, isZoom: true}))
         ];
         
         console.log('합쳐진 예약 목록:', allBookings.length, '개', allBookings);
