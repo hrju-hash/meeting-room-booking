@@ -1128,37 +1128,48 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
     }
 
     setupFAQ() {
-        // 기존 이벤트 리스너 제거를 위해 모든 FAQ 항목 재설정
-        const faqItems = document.querySelectorAll('.faq-item');
+        // 이벤트 위임을 사용하여 FAQ 컨테이너에 한 번만 이벤트 리스너 추가
+        const faqContainer = document.querySelector('.faq-container');
+        if (!faqContainer) return;
         
-        faqItems.forEach((item, index) => {
-            // 기존 이벤트 리스너 제거를 위해 새로 설정
-            const question = item.querySelector('.faq-question');
-            if (question) {
-                // 기존 이벤트 리스너 제거 (이벤트 위임 사용)
-                question.onclick = null;
-                
-                // 클릭 이벤트 리스너 추가
-                question.addEventListener('click', function(e) {
-                    e.stopPropagation();
-                    const isActive = item.classList.contains('active');
-                    
-                    // 모든 FAQ 항목 닫기
-                    faqItems.forEach(otherItem => {
-                        if (otherItem !== item) {
-                            otherItem.classList.remove('active');
-                        }
-                    });
-                    
-                    // 클릭한 항목만 토글
-                    if (isActive) {
-                        item.classList.remove('active');
-                    } else {
-                        item.classList.add('active');
-                    }
-                }, { once: false });
+        // 기존 이벤트 리스너가 있다면 제거 (중복 방지)
+        const existingHandler = faqContainer._faqClickHandler;
+        if (existingHandler) {
+            faqContainer.removeEventListener('click', existingHandler);
+        }
+        
+        // 이벤트 위임으로 FAQ 질문 클릭 처리
+        const clickHandler = (e) => {
+            const question = e.target.closest('.faq-question');
+            if (!question) return;
+            
+            const faqItem = question.closest('.faq-item');
+            if (!faqItem) return;
+            
+            e.stopPropagation();
+            e.preventDefault();
+            
+            const isActive = faqItem.classList.contains('active');
+            const allFaqItems = faqContainer.querySelectorAll('.faq-item');
+            
+            // 모든 FAQ 항목 닫기
+            allFaqItems.forEach(otherItem => {
+                if (otherItem !== faqItem) {
+                    otherItem.classList.remove('active');
+                }
+            });
+            
+            // 클릭한 항목만 토글
+            if (isActive) {
+                faqItem.classList.remove('active');
+            } else {
+                faqItem.classList.add('active');
             }
-        });
+        };
+        
+        // 핸들러를 저장하여 나중에 제거할 수 있도록 함
+        faqContainer._faqClickHandler = clickHandler;
+        faqContainer.addEventListener('click', clickHandler);
     }
 }
 

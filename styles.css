@@ -871,14 +871,16 @@ form {
     max-height: 0;
     overflow: hidden;
     transition: max-height 0.3s ease, padding 0.3s ease;
-    padding: 0 0;
-    display: block;
+    padding: 0;
+    display: block !important;
+    visibility: hidden;
 }
 
 .faq-item.active .faq-answer {
     max-height: 1000px;
     padding: 0 0 20px 0;
-    display: block;
+    display: block !important;
+    visibility: visible;
 }
 
 .faq-answer p {
