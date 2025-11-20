@@ -728,11 +728,23 @@ class UI {
         list.innerHTML = '';
 
         // 데이터 확인 - LocalStorage 폴백도 확인
-        let bookings = this.dataManager.bookings || [];
-        let zoomBookings = this.dataManager.zoomBookings || [];
+        let bookings = [];
+        let zoomBookings = [];
+        
+        // 먼저 Firebase에서 확인
+        if (this.dataManager.db) {
+            bookings = Array.isArray(this.dataManager.bookings) ? this.dataManager.bookings : [];
+            zoomBookings = Array.isArray(this.dataManager.zoomBookings) ? this.dataManager.zoomBookings : [];
+            console.log('Firebase에서 로드:', {
+                bookings: bookings.length,
+                zoomBookings: zoomBookings.length,
+                bookingsData: bookings,
+                zoomBookingsData: zoomBookings
+            });
+        }
         
         // Firebase가 없거나 데이터가 비어있으면 LocalStorage에서 로드
-        if (!this.dataManager.db || bookings.length === 0) {
+        if (bookings.length === 0) {
             const localBookings = this.dataManager.loadBookingsFromLocal();
             if (localBookings.length > 0) {
                 console.log('LocalStorage에서 bookings 로드:', localBookings.length, '개');
@@ -740,7 +752,7 @@ class UI {
             }
         }
         
-        if (!this.dataManager.db || zoomBookings.length === 0) {
+        if (zoomBookings.length === 0) {
             const localZoomBookings = this.dataManager.loadZoomBookingsFromLocal();
             if (localZoomBookings.length > 0) {
                 console.log('LocalStorage에서 zoomBookings 로드:', localZoomBookings.length, '개');
