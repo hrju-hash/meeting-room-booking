@@ -1097,7 +1097,17 @@ class UI {
         document.getElementById('booking-end').value = '';
         document.getElementById('booking-attendees').value = '';
 
+        // 모달 표시
         modal.classList.add('active');
+        console.log('줌 모달 열기 완료:', modal.classList.contains('active'));
+        
+        // 모달이 실제로 표시되는지 확인
+        setTimeout(() => {
+            if (!modal.classList.contains('active')) {
+                console.warn('줌 모달이 열리지 않았습니다. 강제로 다시 시도합니다.');
+                modal.classList.add('active');
+            }
+        }, 100);
     }
 
     closeBookingModal() {
