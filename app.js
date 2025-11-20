@@ -1019,7 +1019,21 @@ class UI {
         document.getElementById('booking-end').value = '';
         document.getElementById('booking-attendees').value = '';
 
+        // 모달 표시 - 여러 방법으로 시도
+        console.log('달력에서 모달 표시 시도...');
         modal.classList.add('active');
+        modal.style.display = 'flex';
+        modal.style.visibility = 'visible';
+        modal.style.opacity = '1';
+        
+        setTimeout(() => {
+            if (!modal.classList.contains('active')) {
+                console.warn('⚠️ 모달이 열리지 않았습니다. 강제로 다시 시도합니다.');
+                modal.classList.add('active');
+                modal.style.display = 'flex';
+            }
+            console.log('✅ 달력 모달 열기 완료');
+        }, 50);
     }
 
     openZoomBookingModal() {
