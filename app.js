@@ -1376,12 +1376,19 @@ class UI {
         }
 
         // 회의실 정보 찾기 (Firebase 또는 LocalStorage에서)
-        let room = this.dataManager.rooms.find(r => r.id === roomId);
+        let room = null;
+        
+        // rooms가 배열이고 비어있지 않은지 확인
+        if (Array.isArray(this.dataManager.rooms) && this.dataManager.rooms.length > 0) {
+            room = this.dataManager.rooms.find(r => r && r.id === roomId);
+        }
         
         // Firebase 데이터가 없으면 LocalStorage에서 찾기
         if (!room) {
             const localRooms = this.dataManager.loadRoomsFromLocal();
-            room = localRooms.find(r => r.id === roomId);
+            if (Array.isArray(localRooms) && localRooms.length > 0) {
+                room = localRooms.find(r => r && r.id === roomId);
+            }
         }
         
         // 여전히 없으면 기본 회의실 정보 사용
@@ -1398,11 +1405,21 @@ class UI {
         
         console.log('회의실 정보:', room);
         
+        // room이 여전히 없으면 오류
+        if (!room) {
+            console.error('회의실 정보를 찾을 수 없습니다. roomId:', roomId);
+            this.showNotification('회의실 정보를 찾을 수 없습니다. 페이지를 새로고침해주세요.', 'error');
+            return;
+        }
+        
         const useZoom = document.getElementById('booking-zoom') && document.getElementById('booking-zoom').checked;
 
+        // room.name이 없을 수 있으므로 안전하게 처리
+        const roomName = (room && room.name) ? room.name : `회의실 ${roomId}`;
+        
         const booking = {
             roomId,
-            roomName: room.name || `회의실 ${roomId}`,
+            roomName: roomName,
             date,
             startTime,
             endTime,
