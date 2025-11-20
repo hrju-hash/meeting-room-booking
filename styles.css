@@ -795,3 +795,21 @@ form {
 .calendar-day-header:nth-child(7) {
     color: white !important;
 }
+
+/* Holiday label */
+.holiday-label {
+    background: #ef4444;
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 8px;
+    border-radius: 4px;
+    margin-top: 4px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
+    box-sizing: border-box;
+    display: block;
+}
