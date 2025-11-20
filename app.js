@@ -263,7 +263,16 @@ class DataManager {
         booking.id = Date.now();
         booking.createdAt = new Date().toISOString();
         this.bookings.push(booking);
+        console.log('✅ 예약 추가:', booking);
+        console.log('현재 bookings 배열:', this.bookings);
         this.saveBookings();
+        
+        // 콜백 즉시 호출 (UI 업데이트)
+        if (this.callbacks.onBookingsUpdate) {
+            console.log('✅ Bookings 업데이트 콜백 즉시 호출');
+            this.callbacks.onBookingsUpdate(this.bookings);
+        }
+        
         return booking;
     }
 
