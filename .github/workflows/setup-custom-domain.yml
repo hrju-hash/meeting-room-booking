@@ -1,0 +1,48 @@
+name: Setup Custom Domain
+
+on:
+  workflow_dispatch:
+    inputs:
+      api_token:
+        description: 'Cloudflare API Token'
+        required: true
+        type: string
+      account_id:
+        description: 'Cloudflare Account ID'
+        required: true
+        type: string
+      domain:
+        description: 'Custom Domain (e.g., malgn.booking.com)'
+        required: false
+        default: 'malgn.booking.com'
+      project_name:
+        description: 'Cloudflare Pages Project Name'
+        required: false
+        default: 'meeting-room-booking'
+
+jobs:
+  setup-domain:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Setup Custom Domain
+        run: |
+          echo "Setting up custom domain: ${{ github.event.inputs.domain }}"
+          
+          # Add custom domain via Cloudflare API
+          response=$(curl -s -X POST \
+            "https://api.cloudflare.com/client/v4/accounts/${{ github.event.inputs.account_id }}/pages/projects/${{ github.event.inputs.project_name }}/domains" \
+            -H "Authorization: Bearer ${{ github.event.inputs.api_token }}" \
+            -H "Content-Type: application/json" \
+            -d "{\"domain\":\"${{ github.event.inputs.domain }}\"}")
+          
+          echo "Response: $response"
+          
+          # Check if successful
+          if echo "$response" | grep -q '"success":true'; then
+            echo "✅ Custom domain added successfully!"
+          else
+            echo "❌ Failed to add custom domain"
+            echo "$response" | jq '.'
+            exit 1
+          fi
+
