@@ -1444,7 +1444,7 @@ class UI {
                     userName,
                     attendees: attendees || '',
                     purpose,
-                    roomName: room ? (room.name || `회의실 ${roomId}`) : `회의실 ${roomId}`
+                    roomName: (room && room.name) ? room.name : `회의실 ${roomId}`
                 };
                 this.dataManager.addZoomBooking(zoomBooking);
             }
