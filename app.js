@@ -222,17 +222,28 @@ class DataManager {
             // 배열을 객체로 변환 (Firebase는 배열 인덱스를 키로 사용)
             const bookingsObj = {};
             this.bookings.forEach(booking => {
-                bookingsObj[booking.id] = booking;
+                if (booking && booking.id) {
+                    bookingsObj[booking.id] = booking;
+                }
             });
-            console.log('Firebase에 예약 저장:', Object.keys(bookingsObj).length, '개');
+            console.log('Firebase에 예약 저장:', Object.keys(bookingsObj).length, '개', bookingsObj);
             this.db.ref('bookings').set(bookingsObj).then(() => {
-                console.log('Firebase 저장 완료');
+                console.log('✅ Firebase 저장 완료');
+                // 저장 후 콜백 호출 (UI 업데이트)
+                if (this.callbacks.onBookingsUpdate) {
+                    console.log('✅ Firebase 저장 후 콜백 호출');
+                    this.callbacks.onBookingsUpdate(this.bookings);
+                }
             }).catch((error) => {
-                console.error('Firebase 저장 오류:', error);
+                console.error('❌ Firebase 저장 오류:', error);
             });
         } else {
             console.log('LocalStorage에 예약 저장:', this.bookings.length, '개');
             this.saveBookingsToLocal();
+            // LocalStorage 저장 후에도 콜백 호출
+            if (this.callbacks.onBookingsUpdate) {
+                this.callbacks.onBookingsUpdate(this.bookings);
+            }
         }
     }
 
@@ -281,7 +292,16 @@ class DataManager {
         booking.id = Date.now();
         booking.createdAt = new Date().toISOString();
         this.zoomBookings.push(booking);
+        console.log('✅ 줌 예약 추가:', booking);
+        console.log('현재 zoomBookings 배열:', this.zoomBookings);
         this.saveZoomBookings();
+        
+        // 콜백 즉시 호출 (UI 업데이트)
+        if (this.callbacks.onZoomBookingsUpdate) {
+            console.log('✅ ZoomBookings 업데이트 콜백 즉시 호출');
+            this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
+        }
+        
         return booking;
     }
 
@@ -1451,8 +1471,20 @@ class UI {
         }
 
         this.closeBookingModal();
-        this.renderBookings();
-        this.renderCalendar();
+        
+        // 약간의 지연을 두고 렌더링 (Firebase 저장 완료 대기)
+        setTimeout(() => {
+            console.log('예약 완료 후 렌더링 시작');
+            this.renderBookings();
+            this.renderCalendar();
+        }, 300);
+        
+        setTimeout(() => {
+            console.log('예약 완료 후 렌더링 재시도');
+            this.renderBookings();
+            this.renderCalendar();
+        }, 1000);
+        
         this.showNotification('예약이 완료되었습니다!');
     }
 
