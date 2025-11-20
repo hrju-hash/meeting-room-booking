@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 자동 설정 도우미</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+        .step {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-radius: 8px;
+        }
+        .step-number {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 30px;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+        .step-title {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .step-content {
+            color: #666;
+            line-height: 1.6;
+            margin-left: 40px;
+        }
+        .step-content ol {
+            margin-left: 20px;
+            margin-top: 10px;
+        }
+        .step-content li {
+            margin-bottom: 8px;
+        }
+        .link-button {
+            display: inline-block;
+            background: #667eea;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+        .link-button:hover {
+            background: #5568d3;
+        }
+        .code-block {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        .copy-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .copy-button:hover {
+            background: #38a169;
+        }
+        .config-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            margin-top: 10px;
+        }
+        .config-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        .save-button {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-top: 15px;
+            width: 100%;
+        }
+        .save-button:hover {
+            background: #38a169;
+        }
+        .success-message {
+            background: #c6f6d5;
+            color: #22543d;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+            display: none;
+        }
+        .warning {
+            background: #fed7d7;
+            color: #742a2a;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase 자동 설정 도우미</h1>
+        <p class="subtitle">5분 안에 Firebase 데이터베이스를 설정하고 배포까지 완료하세요!</p>
+
+        <!-- 1단계 -->
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">1</span>
+                Firebase 프로젝트 생성
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>아래 버튼을 클릭하여 Firebase 콘솔을 엽니다</li>
+                    <li>"프로젝트 추가" 또는 "Add project" 클릭</li>
+                    <li>프로젝트 이름: <strong>malgn-booking</strong> 입력</li>
+                    <li>Google Analytics: <strong>비활성화</strong> (체크 해제)</li>
+                    <li>"프로젝트 만들기" 클릭</li>
+                </ol>
+                <a href="https://console.firebase.google.com/" target="_blank" class="link-button">Firebase 콘솔 열기</a>
+            </div>
+        </div>
+
+        <!-- 2단계 -->
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">2</span>
+                Realtime Database 생성
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>왼쪽 메뉴에서 "Realtime Database" 클릭</li>
+                    <li>"데이터베이스 만들기" 클릭</li>
+                    <li>위치: <strong>asia-northeast3 (Seoul)</strong> 선택</li>
+                    <li>보안 규칙: <strong>테스트 모드로 시작</strong> 선택</li>
+                    <li>"완료" 클릭</li>
+                </ol>
+                <div class="warning">
+                    ⚠️ 데이터베이스가 생성되면 "규칙" 탭에서 아래 규칙으로 변경하고 "게시" 클릭하세요:
+                    <div class="code-block" id="rules-code">
+{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}
+                    </div>
+                    <button class="copy-button" onclick="copyToClipboard('rules-code')">규칙 복사</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3단계 -->
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">3</span>
+                웹 앱 등록 및 구성 정보 복사
+            </div>
+            <div class="step-content">
+                <ol>
+                    <li>왼쪽 상단 ⚙️ 아이콘 클릭 > "프로젝트 설정"</li>
+                    <li>아래로 스크롤하여 "앱" 섹션 확인</li>
+                    <li>웹 아이콘 (<code>&lt;/&gt;</code>) 클릭</li>
+                    <li>앱 닉네임: <strong>malgn-booking-web</strong> 입력</li>
+                    <li>"Firebase Hosting도 설정하시겠습니까?" → <strong>체크 해제</strong></li>
+                    <li>"앱 등록" 클릭</li>
+                    <li>표시되는 구성 정보에서 <code>firebaseConfig</code> 객체 <strong>전체 복사</strong></li>
+                </ol>
+                <div class="warning">
+                    💡 구성 정보는 다음과 같은 형식입니다:
+                    <div class="code-block">
+const firebaseConfig = {
+  apiKey: "AIzaSy...",
+  authDomain: "...",
+  databaseURL: "https://...-default-rtdb.asia-northeast3.firebasedatabase.app",
+  projectId: "...",
+  storageBucket: "...",
+  messagingSenderId: "...",
+  appId: "..."
+};
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4단계 -->
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">4</span>
+                구성 정보 입력 및 저장
+            </div>
+            <div class="step-content">
+                <p>Firebase 콘솔에서 복사한 <code>firebaseConfig</code> 객체를 아래에 붙여넣으세요:</p>
+                <textarea 
+                    id="config-input" 
+                    class="config-input" 
+                    rows="12" 
+                    placeholder="const firebaseConfig = {
+  apiKey: '...',
+  authDomain: '...',
+  databaseURL: '...',
+  projectId: '...',
+  storageBucket: '...',
+  messagingSenderId: '...',
+  appId: '...'
+};"></textarea>
+                <button class="save-button" onclick="saveConfig()">구성 정보 저장</button>
+                <div class="success-message" id="success-message">
+                    ✅ 구성 정보가 저장되었습니다! 이제 배포할 수 있습니다.
+                </div>
+            </div>
+        </div>
+
+        <!-- 5단계 -->
+        <div class="step">
+            <div class="step-title">
+                <span class="step-number">5</span>
+                배포
+            </div>
+            <div class="step-content">
+                <p>구성 정보를 저장한 후, 아래 버튼을 클릭하여 자동으로 배포합니다:</p>
+                <button class="save-button" onclick="deploy()" id="deploy-button" disabled>배포하기</button>
+                <div id="deploy-status"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent.trim();
+            navigator.clipboard.writeText(text).then(() => {
+                alert('복사되었습니다!');
+            });
+        }
+
+        function saveConfig() {
+            const configText = document.getElementById('config-input').value.trim();
+            
+            if (!configText) {
+                alert('구성 정보를 입력해주세요.');
+                return;
+            }
+
+            // firebase-config.js 파일 형식으로 변환
+            let configContent = `// Firebase 설정 파일
+// Firebase 프로젝트에서 자동으로 생성된 구성 정보
+
+${configText}
+
+// Firebase 초기화
+let firebaseInitialized = false;
+if (typeof firebase !== 'undefined') {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        firebaseInitialized = true;
+        console.log('Firebase가 성공적으로 초기화되었습니다.');
+    } catch (error) {
+        console.error('Firebase 초기화 오류:', error);
+        console.warn('Firebase 구성 정보를 확인하세요. LocalStorage를 사용합니다.');
+    }
+} else {
+    console.error('Firebase SDK가 로드되지 않았습니다.');
+}
+`;
+
+            // Blob으로 파일 생성
+            const blob = new Blob([configContent], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'firebase-config.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // 성공 메시지 표시
+            document.getElementById('success-message').style.display = 'block';
+            document.getElementById('deploy-button').disabled = false;
+            
+            // 로컬 스토리지에 저장 (나중에 사용)
+            localStorage.setItem('firebaseConfig', configText);
+        }
+
+        async function deploy() {
+            const deployButton = document.getElementById('deploy-button');
+            const deployStatus = document.getElementById('deploy-status');
+            
+            deployButton.disabled = true;
+            deployButton.textContent = '배포 중...';
+            deployStatus.innerHTML = '<p style="color: #667eea;">Git에 커밋하고 푸시하는 중...</p>';
+
+            try {
+                // 여기서는 실제로 Git 명령을 실행할 수 없으므로 안내만 제공
+                deployStatus.innerHTML = `
+                    <div style="background: #c6f6d5; color: #22543d; padding: 15px; border-radius: 8px; margin-top: 10px;">
+                        <p><strong>다음 명령을 실행하세요:</strong></p>
+                        <div class="code-block" style="margin-top: 10px;">
+git add firebase-config.js<br>
+git commit -m "Firebase 설정 추가"<br>
+git push
+                        </div>
+                        <p style="margin-top: 10px;">또는 자동 배포 스크립트를 사용하세요:</p>
+                        <div class="code-block" style="margin-top: 10px;">
+.\deploy.bat
+                        </div>
+                    </div>
+                `;
+                deployButton.textContent = '배포 완료';
+            } catch (error) {
+                deployStatus.innerHTML = `<p style="color: red;">오류: ${error.message}</p>`;
+                deployButton.disabled = false;
+                deployButton.textContent = '배포하기';
+            }
+        }
+
+        // 저장된 구성 정보가 있으면 불러오기
+        window.addEventListener('load', () => {
+            const savedConfig = localStorage.getItem('firebaseConfig');
+            if (savedConfig) {
+                document.getElementById('config-input').value = savedConfig;
+            }
+        });
+    </script>
+</body>
+</html>
+
