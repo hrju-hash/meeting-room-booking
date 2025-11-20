@@ -252,6 +252,7 @@ class UI {
         this.setupEventListeners();
         this.renderBookings();
         this.renderCalendar();
+        this.renderRooms();
         this.setupModal();
         this.setupFAQ();
         
@@ -338,6 +339,7 @@ class UI {
 
     renderRooms() {
         const grid = document.getElementById('rooms-grid');
+        if (!grid) return; // rooms-grid가 없으면 종료
         grid.innerHTML = '';
 
         this.dataManager.rooms.forEach(room => {
