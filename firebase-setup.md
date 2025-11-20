@@ -70,3 +70,4 @@ const firebaseConfig = {
 
 이 정보를 `app.js` 파일에 추가해야 합니다.
 
+

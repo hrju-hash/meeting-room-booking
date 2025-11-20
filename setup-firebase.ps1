@@ -228,3 +228,4 @@ Write-Host ""
 Write-Host "Firebase 콘솔: https://console.firebase.google.com/project/$projectName" -ForegroundColor Gray
 Write-Host ""
 
+

@@ -374,6 +374,7 @@ class UI {
         this.setupEventListeners();
         this.renderCalendar();
         this.renderRooms();
+        this.renderZoomAccount();
         this.setupModal();
         this.setupFAQ();
         
@@ -859,7 +860,10 @@ class UI {
                 
                 card.querySelector('.btn-danger').addEventListener('click', async () => {
                     if (await customConfirm('정말 예약을 취소하시겠습니까?')) {
-                        this.cancelZoomBooking(booking.id);
+                        const confirmed = await this.verifyPassword(booking);
+                        if (confirmed) {
+                            this.cancelZoomBooking(booking.id);
+                        }
                     }
                 });
             } else {
@@ -898,7 +902,10 @@ class UI {
                 
                 card.querySelector('.btn-danger').addEventListener('click', async () => {
                     if (await customConfirm('정말 예약을 취소하시겠습니까?')) {
-                        this.cancelBooking(booking.id);
+                        const confirmed = await this.verifyPassword(booking);
+                        if (confirmed) {
+                            this.cancelBooking(booking.id);
+                        }
                     }
                 });
             }
@@ -1459,6 +1466,18 @@ class UI {
         const userName = document.getElementById('booking-user').value;
         const purpose = document.getElementById('booking-purpose').value;
         const attendees = document.getElementById('booking-attendees').value;
+        const password = document.getElementById('booking-password').value;
+        
+        // 비밀번호 유효성 검사
+        if (!password || password.trim() === '') {
+            this.showNotification('예약 비밀번호를 입력해주세요.', 'error');
+            return;
+        }
+        
+        if (password.length < 4) {
+            this.showNotification('비밀번호는 최소 4자 이상이어야 합니다.', 'error');
+            return;
+        }
 
         // 유효성 검사
         if (startTime >= endTime) {
@@ -1483,7 +1502,8 @@ class UI {
                 endTime,
                 userName,
                 attendees: attendees || '',
-                purpose
+                purpose,
+                password: password
             };
 
             this.dataManager.addZoomBooking(zoomBooking);
@@ -1575,7 +1595,8 @@ class UI {
             userName,
             attendees: attendees || '',
             purpose,
-            useZoom: useZoom || false
+            useZoom: useZoom || false,
+            password: password
         };
 
         this.dataManager.addBooking(booking);
@@ -1593,7 +1614,8 @@ class UI {
                     userName,
                     attendees: attendees || '',
                     purpose,
-                    roomName: (room && room.name) ? room.name : `회의실 ${roomId}`
+                    roomName: (room && room.name) ? room.name : `회의실 ${roomId}`,
+                    password: password
                 };
                 this.dataManager.addZoomBooking(zoomBooking);
             }
@@ -1628,8 +1650,99 @@ class UI {
 
     cancelZoomBooking(bookingId) {
         this.dataManager.deleteZoomBooking(bookingId);
+        this.renderBookings();
         this.renderCalendar();
         this.showNotification('줌 예약이 취소되었습니다.');
+    }
+    
+    verifyPassword(booking) {
+        return new Promise((resolve) => {
+            const modal = document.getElementById('password-modal');
+            const passwordInput = document.getElementById('cancel-password');
+            const okBtn = document.getElementById('password-ok-btn');
+            const cancelBtn = document.getElementById('password-cancel-btn');
+            const closeBtn = document.getElementById('close-password-modal');
+            
+            if (!modal || !passwordInput || !okBtn || !cancelBtn) {
+                console.error('비밀번호 확인 모달 요소를 찾을 수 없습니다!');
+                resolve(false);
+                return;
+            }
+            
+            // 입력 필드 초기화
+            passwordInput.value = '';
+            passwordInput.focus();
+            
+            // 모달 표시
+            modal.classList.add('active');
+            modal.style.display = 'flex';
+            modal.style.visibility = 'visible';
+            modal.style.opacity = '1';
+            modal.style.pointerEvents = 'auto';
+            
+            const cleanup = () => {
+                modal.classList.remove('active');
+                modal.style.display = 'none';
+                modal.style.visibility = 'hidden';
+                modal.style.opacity = '0';
+                modal.style.pointerEvents = 'none';
+                passwordInput.value = '';
+                okBtn.onclick = null;
+                cancelBtn.onclick = null;
+                if (closeBtn) closeBtn.onclick = null;
+            };
+            
+            const handleConfirm = () => {
+                const inputPassword = passwordInput.value.trim();
+                const bookingPassword = booking.password || '';
+                
+                if (!inputPassword) {
+                    this.showNotification('비밀번호를 입력해주세요.', 'error');
+                    passwordInput.focus();
+                    return;
+                }
+                
+                if (inputPassword !== bookingPassword) {
+                    this.showNotification('비밀번호가 일치하지 않습니다.', 'error');
+                    passwordInput.value = '';
+                    passwordInput.focus();
+                    return;
+                }
+                
+                cleanup();
+                resolve(true);
+            };
+            
+            okBtn.onclick = handleConfirm;
+            cancelBtn.onclick = () => {
+                cleanup();
+                resolve(false);
+            };
+            
+            if (closeBtn) {
+                closeBtn.onclick = () => {
+                    cleanup();
+                    resolve(false);
+                };
+            }
+            
+            // Enter 키로 확인
+            passwordInput.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    e.preventDefault();
+                    handleConfirm();
+                }
+            };
+            
+            // 모달 배경 클릭 시 취소
+            modal.addEventListener('click', function backdropClick(e) {
+                if (e.target === modal) {
+                    cleanup();
+                    resolve(false);
+                    modal.removeEventListener('click', backdropClick);
+                }
+            }, { once: true });
+        });
     }
 
     formatDate(dateString) {
@@ -1972,9 +2085,12 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
 ${booking.roomName ? `회의실: ${booking.roomName}` : ''}
             `.trim();
             
-            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then((confirmed) => {
+            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then(async (confirmed) => {
                 if (confirmed) {
-                    this.cancelZoomBooking(booking.id);
+                    const passwordConfirmed = await this.verifyPassword(booking);
+                    if (passwordConfirmed) {
+                        this.cancelZoomBooking(booking.id);
+                    }
                 }
             });
         } else {
@@ -2002,9 +2118,12 @@ ${booking.attendees ? `참석자: ${booking.attendees}` : ''}
 ${booking.purpose ? `목적: ${booking.purpose}` : ''}
             `.trim();
             
-            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then((confirmed) => {
+            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then(async (confirmed) => {
                 if (confirmed) {
-                    this.cancelBooking(booking.id);
+                    const passwordConfirmed = await this.verifyPassword(booking);
+                    if (passwordConfirmed) {
+                        this.cancelBooking(booking.id);
+                    }
                 }
             });
         }
