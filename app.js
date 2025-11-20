@@ -1451,8 +1451,23 @@ class UI {
                 event.appendChild(time);
                 
                 // 클릭 시 상세 정보 표시 및 취소 옵션
+                event.style.cursor = 'pointer';
+                event.style.pointerEvents = 'auto';
+                event.style.position = 'relative';
+                event.style.zIndex = '10';
+                
                 event.addEventListener('click', (e) => {
                     e.stopPropagation();
+                    e.preventDefault();
+                    console.log('예약 클릭:', booking);
+                    this.showBookingDetails(booking);
+                });
+                
+                // 터치 이벤트도 지원
+                event.addEventListener('touchstart', (e) => {
+                    e.stopPropagation();
+                    e.preventDefault();
+                    console.log('예약 터치:', booking);
                     this.showBookingDetails(booking);
                 });
                 
