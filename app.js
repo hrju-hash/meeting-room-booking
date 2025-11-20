@@ -938,6 +938,7 @@ class UI {
 
             const dateStr = this.formatDateForCalendar(currentDate);
             const isHoliday = this.isHoliday(dateStr);
+            const holidayName = isHoliday ? this.getHolidayName(dateStr) : null;
             
             if (isHoliday) {
                 dayCell.classList.add('holiday');
@@ -947,6 +948,14 @@ class UI {
             dayNumber.className = 'day-number';
             dayNumber.textContent = currentDate.getDate();
             dayCell.appendChild(dayNumber);
+
+            // 공휴일 이름 표시
+            if (holidayName) {
+                const holidayLabel = document.createElement('div');
+                holidayLabel.className = 'holiday-label';
+                holidayLabel.textContent = holidayName;
+                dayCell.appendChild(holidayLabel);
+            }
 
             // 해당 날짜의 예약 목록 가져오기
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
