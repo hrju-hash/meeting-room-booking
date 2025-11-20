@@ -251,11 +251,28 @@ class DataManager {
         if (this.db) {
             const zoomBookingsObj = {};
             this.zoomBookings.forEach(booking => {
-                zoomBookingsObj[booking.id] = booking;
+                if (booking && booking.id) {
+                    zoomBookingsObj[booking.id] = booking;
+                }
             });
-            this.db.ref('zoomBookings').set(zoomBookingsObj);
+            console.log('Firebase에 줌 예약 저장:', Object.keys(zoomBookingsObj).length, '개', zoomBookingsObj);
+            this.db.ref('zoomBookings').set(zoomBookingsObj).then(() => {
+                console.log('✅ Firebase 줌 예약 저장 완료');
+                // 저장 후 콜백 호출 (UI 업데이트)
+                if (this.callbacks.onZoomBookingsUpdate) {
+                    console.log('✅ Firebase 줌 예약 저장 후 콜백 호출');
+                    this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
+                }
+            }).catch((error) => {
+                console.error('❌ Firebase 줌 예약 저장 오류:', error);
+            });
         } else {
+            console.log('LocalStorage에 줌 예약 저장:', this.zoomBookings.length, '개');
             this.saveZoomBookingsToLocal();
+            // LocalStorage 저장 후에도 콜백 호출
+            if (this.callbacks.onZoomBookingsUpdate) {
+                this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
+            }
         }
     }
 
