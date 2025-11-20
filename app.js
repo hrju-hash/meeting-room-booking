@@ -1349,7 +1349,7 @@ class UI {
                     userName,
                     attendees: attendees || '',
                     purpose,
-                    roomName: room.name
+                    roomName: room ? (room.name || `회의실 ${roomId}`) : `회의실 ${roomId}`
                 };
                 this.dataManager.addZoomBooking(zoomBooking);
             }
