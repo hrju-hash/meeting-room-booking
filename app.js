@@ -647,14 +647,19 @@ class UI {
     }
 
     renderZoomAccount() {
-        const grid = document.getElementById('zoom-grid');
+        const grid = document.getElementById('rooms-grid');
         if (!grid) return;
         
-        grid.innerHTML = '';
-
-        // 줌 계정 카드 추가
+        // 기존 줌 카드가 있으면 제거 (중복 방지)
+        const existingZoomCard = grid.querySelector('[data-zoom-card]');
+        if (existingZoomCard) {
+            existingZoomCard.remove();
+        }
+        
+        // 줌 계정 카드 추가 (rooms-grid에 직접 추가)
         const zoomCard = document.createElement('div');
         zoomCard.className = 'room-card';
+        zoomCard.setAttribute('data-zoom-card', 'true');
         zoomCard.innerHTML = `
             <h3>📹 줌 예약</h3>
             <div class="room-info">
