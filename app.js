@@ -859,13 +859,22 @@ class UI {
             } else {
                 // 회의실 예약 카드
                 // 회의실 정보 찾기 (Firebase 또는 LocalStorage에서)
-                let room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+                let room = null;
+                
+                // rooms가 배열이고 비어있지 않은지 확인
+                if (Array.isArray(this.dataManager.rooms) && this.dataManager.rooms.length > 0) {
+                    room = this.dataManager.rooms.find(r => r && r.id === booking.roomId);
+                }
+                
                 if (!room) {
                     const localRooms = this.dataManager.loadRoomsFromLocal();
-                    room = localRooms.find(r => r.id === booking.roomId);
+                    if (Array.isArray(localRooms) && localRooms.length > 0) {
+                        room = localRooms.find(r => r && r.id === booking.roomId);
+                    }
                 }
+                
                 if (!room) {
-                    room = { id: booking.roomId, name: `회의실 ${booking.roomId}` };
+                    room = { id: booking.roomId, name: booking.roomName || `회의실 ${booking.roomId}` };
                 }
                 card.innerHTML = `
                     <div class="booking-info">
@@ -1886,10 +1895,18 @@ ${booking.roomName ? `회의실: ${booking.roomName}` : ''}
             });
         } else {
             // room은 사용하지 않지만 안전을 위해 확인
-            let room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+            let room = null;
+            
+            // rooms가 배열이고 비어있지 않은지 확인
+            if (Array.isArray(this.dataManager.rooms) && this.dataManager.rooms.length > 0) {
+                room = this.dataManager.rooms.find(r => r && r.id === booking.roomId);
+            }
+            
             if (!room) {
                 const localRooms = this.dataManager.loadRoomsFromLocal();
-                room = localRooms.find(r => r.id === booking.roomId);
+                if (Array.isArray(localRooms) && localRooms.length > 0) {
+                    room = localRooms.find(r => r && r.id === booking.roomId);
+                }
             }
             
             details = `
