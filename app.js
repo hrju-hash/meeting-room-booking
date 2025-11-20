@@ -40,7 +40,18 @@ class DataManager {
         // 실시간 동기화
         roomsRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            this.rooms = data ? Object.values(data) : [];
+            if (data) {
+                // Firebase는 배열을 객체로 저장하므로 변환 필요
+                if (Array.isArray(data)) {
+                    this.rooms = data;
+                } else {
+                    // 객체인 경우 배열로 변환 (id 순서대로 정렬)
+                    this.rooms = Object.values(data).sort((a, b) => (a.id || 0) - (b.id || 0));
+                }
+            } else {
+                this.rooms = [];
+            }
+            
             if (this.rooms.length === 0) {
                 this.initDefaultRooms();
             }
@@ -100,8 +111,13 @@ class DataManager {
             ];
             
             if (this.db) {
-                // Firebase에 저장
-                this.db.ref('rooms').set(defaultRooms);
+                // Firebase에 저장 (배열을 객체로 변환하여 저장)
+                const roomsObj = {};
+                defaultRooms.forEach(room => {
+                    roomsObj[room.id] = room;
+                });
+                this.db.ref('rooms').set(roomsObj);
+                this.rooms = defaultRooms; // 즉시 사용 가능하도록
             } else {
                 // LocalStorage에 저장
                 this.rooms = defaultRooms;
@@ -630,7 +646,24 @@ class UI {
         // 회의실 선택 옵션 채우기
         const roomSelect = document.getElementById('booking-room');
         roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
-        this.dataManager.rooms.forEach(room => {
+        
+        // rooms가 비어있으면 LocalStorage에서도 확인
+        let roomsToUse = this.dataManager.rooms;
+        if (roomsToUse.length === 0) {
+            roomsToUse = this.dataManager.loadRoomsFromLocal();
+            // LocalStorage에도 없으면 기본 회의실 사용
+            if (roomsToUse.length === 0) {
+                this.dataManager.initDefaultRooms();
+                roomsToUse = this.dataManager.rooms.length > 0 ? this.dataManager.rooms : [
+                    { id: 1, name: '소회의실 A' },
+                    { id: 2, name: '소회의실 B' },
+                    { id: 3, name: '소회의실 C' },
+                    { id: 4, name: '대회의실' }
+                ];
+            }
+        }
+        
+        roomsToUse.forEach(room => {
             const option = document.createElement('option');
             option.value = room.id;
             option.textContent = room.name;
@@ -697,7 +730,24 @@ class UI {
         // 회의실 선택 옵션 채우기
         const roomSelect = document.getElementById('booking-room');
         roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
-        this.dataManager.rooms.forEach(room => {
+        
+        // rooms가 비어있으면 LocalStorage에서도 확인
+        let roomsToUse = this.dataManager.rooms;
+        if (roomsToUse.length === 0) {
+            roomsToUse = this.dataManager.loadRoomsFromLocal();
+            // LocalStorage에도 없으면 기본 회의실 사용
+            if (roomsToUse.length === 0) {
+                this.dataManager.initDefaultRooms();
+                roomsToUse = this.dataManager.rooms.length > 0 ? this.dataManager.rooms : [
+                    { id: 1, name: '소회의실 A' },
+                    { id: 2, name: '소회의실 B' },
+                    { id: 3, name: '소회의실 C' },
+                    { id: 4, name: '대회의실' }
+                ];
+            }
+        }
+        
+        roomsToUse.forEach(room => {
             const option = document.createElement('option');
             option.value = room.id;
             option.textContent = room.name;
@@ -755,7 +805,24 @@ class UI {
         // 회의실 선택 옵션 채우기
         const roomSelect = document.getElementById('booking-room');
         roomSelect.innerHTML = '<option value="">회의실을 선택하세요</option>';
-        this.dataManager.rooms.forEach(room => {
+        
+        // rooms가 비어있으면 LocalStorage에서도 확인
+        let roomsToUse = this.dataManager.rooms;
+        if (roomsToUse.length === 0) {
+            roomsToUse = this.dataManager.loadRoomsFromLocal();
+            // LocalStorage에도 없으면 기본 회의실 사용
+            if (roomsToUse.length === 0) {
+                this.dataManager.initDefaultRooms();
+                roomsToUse = this.dataManager.rooms.length > 0 ? this.dataManager.rooms : [
+                    { id: 1, name: '소회의실 A' },
+                    { id: 2, name: '소회의실 B' },
+                    { id: 3, name: '소회의실 C' },
+                    { id: 4, name: '대회의실' }
+                ];
+            }
+        }
+        
+        roomsToUse.forEach(room => {
             const option = document.createElement('option');
             option.value = room.id;
             option.textContent = room.name;
