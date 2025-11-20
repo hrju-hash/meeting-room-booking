@@ -286,7 +286,6 @@ class UI {
 
     init() {
         this.setupEventListeners();
-        this.renderBookings();
         this.renderCalendar();
         this.renderRooms();
         this.setupModal();
@@ -305,6 +304,14 @@ class UI {
             this.dataManager.setOnRoomsUpdate(() => {
                 this.renderRooms();
             });
+            
+            // Firebase 초기화 후 약간의 지연을 두고 데이터 로드
+            setTimeout(() => {
+                this.renderBookings();
+            }, 500);
+        } else {
+            // LocalStorage 사용 시 즉시 렌더링
+            this.renderBookings();
         }
     }
 
@@ -458,9 +465,14 @@ class UI {
         list.innerHTML = '';
 
         // 데이터 확인
+        const bookingsCount = (this.dataManager.bookings || []).length;
+        const zoomBookingsCount = (this.dataManager.zoomBookings || []).length;
         console.log('renderBookings 호출:', {
-            bookings: (this.dataManager.bookings || []).length,
-            zoomBookings: (this.dataManager.zoomBookings || []).length
+            bookings: bookingsCount,
+            zoomBookings: zoomBookingsCount,
+            total: bookingsCount + zoomBookingsCount,
+            bookingsData: this.dataManager.bookings,
+            zoomBookingsData: this.dataManager.zoomBookings
         });
 
         // 회의실 예약과 줌 예약을 합치기
@@ -468,6 +480,8 @@ class UI {
             ...(this.dataManager.bookings || []).map(b => ({...b, isZoom: false})),
             ...(this.dataManager.zoomBookings || []).map(b => ({...b, isZoom: true}))
         ];
+        
+        console.log('합쳐진 예약 목록:', allBookings.length, '개', allBookings);
         
         // 날짜 필터
         const dateFilter = document.getElementById('filter-date').value;
