@@ -831,6 +831,12 @@ class UI {
         }
 
         allBookings.forEach(booking => {
+            // booking이 유효한지 확인
+            if (!booking || !booking.id) {
+                console.warn('유효하지 않은 예약 데이터:', booking);
+                return;
+            }
+            
             const card = document.createElement('div');
             card.className = 'booking-card';
             
