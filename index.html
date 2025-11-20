@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맑은스페이스</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQEAYABgAAD/2wBDAAEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/2wBDAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQH/wAARCAABAAEDASIAAhEBAxEB/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMBAAIRAxEAPwD9/KKKKAP/2Q==" alt="로고" class="logo">
+                <h1>맑은스페이스</h1>
+            </div>
+                <nav>
+                    <button class="nav-btn active" data-page="calendar">목록</button>
+                    <button class="nav-btn" data-page="bookings">내 예약</button>
+                    <button class="nav-btn" data-page="faq">FAQ</button>
+                </nav>
+        </header>
+
+            <!-- 목록 페이지 (달력) -->
+            <section id="calendar-page" class="page active">
+                <div class="page-header">
+                    <h2>예약하기</h2>
+                    <div class="calendar-controls">
+                        <button class="btn-secondary" id="prev-month">◀ 이전</button>
+                        <span id="current-month-year" class="month-year"></span>
+                        <button class="btn-secondary" id="next-month">다음 ▶</button>
+                    </div>
+                </div>
+                <div class="calendar-container">
+                    <div class="calendar-grid" id="calendar-grid">
+                        <!-- 달력이 여기에 동적으로 추가됩니다 -->
+                    </div>
+                </div>
+            </section>
+
+        <!-- 예약 목록 페이지 -->
+        <section id="bookings-page" class="page">
+            <div class="page-header">
+                <h2>내 예약 목록</h2>
+                <div class="filter-group">
+                    <input type="date" id="filter-date" class="filter-input">
+                    <select id="filter-room" class="filter-input">
+                        <option value="">전체 회의실</option>
+                    </select>
+                </div>
+            </div>
+            <div class="bookings-list" id="bookings-list">
+                <!-- 예약 목록이 여기에 동적으로 추가됩니다 -->
+            </div>
+        </section>
+
+        <!-- FAQ 페이지 -->
+        <section id="faq-page" class="page">
+            <div class="page-header">
+                <h2>자주 묻는 질문 (FAQ)</h2>
+            </div>
+            <div class="faq-container">
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>회의실 예약은 어떻게 하나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>1. 목록 페이지에서 원하는 날짜를 클릭합니다.</p>
+                        <p>2. 예약 모달에서 회의실을 선택합니다.</p>
+                        <p>3. 시작 시간과 종료 시간을 선택합니다 (10분 단위).</p>
+                        <p>4. 예약자 이름, 참석자 이름, 회의 목적을 입력합니다.</p>
+                        <p>5. 필요시 "줌 계정도 함께 예약하기" 체크박스를 선택합니다.</p>
+                        <p>6. "예약하기" 버튼을 클릭하여 예약을 완료합니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약을 취소하려면 어떻게 하나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>1. "내 예약" 페이지로 이동합니다.</p>
+                        <p>2. 취소하고 싶은 예약의 "취소" 버튼을 클릭합니다.</p>
+                        <p>3. 확인 메시지에서 "확인"을 클릭하면 예약이 취소됩니다.</p>
+                        <p>또는 달력에서 예약된 이벤트를 클릭하여 상세 정보를 확인하고 취소할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 시간을 변경할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>현재는 예약 시간 변경 기능이 제공되지 않습니다. 시간을 변경하려면 기존 예약을 취소하고 새로운 시간으로 다시 예약해주세요.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>줌 계정이 궁금해요</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>줌 계정 정보는 맑은소프트 PPM 게시판에서 확인할 수 있습니다.</p>
+                        <p><a href="https://malgn.mproject.co.kr/board/post_view.jsp?id=126636&m=cHJvamVjdDE4MTItbGluawEQUALEQUAL&pid=1812" target="_blank" rel="noopener noreferrer" class="faq-link">줌 계정 확인하기 →</a></p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>회의실과 줌 계정을 함께 예약할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 가능합니다. 회의실을 선택하면 "줌 계정도 함께 예약하기" 체크박스가 나타납니다. 이 체크박스를 선택하면 회의실과 줌 계정을 동시에 예약할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 시간은 몇 분 단위로 선택할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>예약 시간은 10분 단위로 선택할 수 있습니다. 시작 시간과 종료 시간 모두 0분, 10분, 20분, 30분, 40분, 50분 중에서 선택할 수 있습니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>같은 시간에 여러 회의실을 예약할 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>네, 가능합니다. 각 회의실은 독립적으로 예약되므로, 같은 시간에 서로 다른 회의실을 예약할 수 있습니다. 단, 같은 회의실의 같은 시간대는 중복 예약이 불가능합니다.</p>
+                    </div>
+                </div>
+
+                <div class="faq-item">
+                    <div class="faq-question">
+                        <h3>예약 후 알림을 받을 수 있나요?</h3>
+                        <span class="faq-toggle">+</span>
+                    </div>
+                    <div class="faq-answer">
+                        <p>현재는 예약 알림 기능이 제공되지 않습니다. 예약 정보는 "내 예약" 페이지에서 확인할 수 있습니다. 향후 이메일 알림 기능이 추가될 예정입니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 예약 모달 -->
+        <div id="booking-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>회의실 예약</h2>
+                    <button class="close-btn" id="close-modal">&times;</button>
+                </div>
+                <form id="booking-form">
+                    <div class="form-group">
+                        <label for="booking-room">회의실 선택</label>
+                        <select id="booking-room" required>
+                            <option value="">회의실을 선택하세요</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-date">날짜</label>
+                        <input type="date" id="booking-date" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-start">시작 시간</label>
+                        <div class="time-input-group">
+                            <select id="booking-start-hour" class="time-select" required>
+                                <option value="">시</option>
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="booking-start-minute" class="time-select" required>
+                                <option value="">분</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="booking-start">
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-end">종료 시간</label>
+                        <div class="time-input-group">
+                            <select id="booking-end-hour" class="time-select" required>
+                                <option value="">시</option>
+                            </select>
+                            <span class="time-separator">:</span>
+                            <select id="booking-end-minute" class="time-select" required>
+                                <option value="">분</option>
+                            </select>
+                        </div>
+                        <input type="hidden" id="booking-end">
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-user">예약자 이름</label>
+                        <input type="text" id="booking-user" placeholder="이름을 입력하세요" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-attendees">참석자 이름</label>
+                        <textarea id="booking-attendees" placeholder="참석자 이름을 입력하세요 (여러 명일 경우 쉼표로 구분)" rows="2"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label for="booking-purpose">회의 목적</label>
+                        <textarea id="booking-purpose" placeholder="회의 목적을 입력하세요" rows="3"></textarea>
+                    </div>
+                    <div class="form-group" id="zoom-checkbox-group" style="display: none;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                            <input type="checkbox" id="booking-zoom" style="width: auto; cursor: pointer;">
+                            <span>줌 계정도 함께 예약하기</span>
+                        </label>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn-secondary" id="cancel-booking">취소</button>
+                        <button type="submit" class="btn-primary">예약하기</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- 알림 메시지 -->
+        <div id="notification" class="notification"></div>
+    </div>
+
+    <!-- 하단 담당자 정보 -->
+    <footer class="footer">
+        <p>담당자: 주혜리대리 | 이메일: <a href="mailto:hr.ju@malgnsoft.com">hr.ju@malgnsoft.com</a></p>
+    </footer>
+
+    <script src="app.js"></script>
+</body>
+</html>
+
