@@ -847,6 +847,11 @@ class UI {
         holidays[`${year}-10-09`] = '한글날';
         holidays[`${year}-12-25`] = '성탄절';
         
+        // 지방선거일
+        if (year === 2026) {
+            holidays['2026-06-03'] = '지방선거';
+        }
+        
         // 음력 공휴일 (2024-2026 기준)
         if (year === 2024) {
             holidays['2024-02-10'] = '설날';
@@ -869,6 +874,64 @@ class UI {
             holidays['2026-09-24'] = '추석';
             holidays['2026-09-25'] = '추석';
             holidays['2026-09-26'] = '추석';
+        }
+        
+        // 대체공휴일 (2024-2026 기준)
+        // 어린이날 대체공휴일
+        if (year === 2024) {
+            holidays['2024-05-06'] = '어린이날 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-05-06'] = '어린이날 대체공휴일';
+        }
+        
+        // 현충일 대체공휴일
+        if (year === 2024) {
+            holidays['2024-06-07'] = '현충일 대체공휴일';
+        }
+        
+        // 광복절 대체공휴일
+        if (year === 2024) {
+            holidays['2024-08-16'] = '광복절 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-08-16'] = '광복절 대체공휴일';
+        }
+        
+        // 개천절 대체공휴일
+        if (year === 2024) {
+            holidays['2024-10-04'] = '개천절 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-10-04'] = '개천절 대체공휴일';
+        }
+        
+        // 한글날 대체공휴일
+        if (year === 2024) {
+            holidays['2024-10-10'] = '한글날 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-10-10'] = '한글날 대체공휴일';
+        }
+        
+        // 설날 대체공휴일
+        if (year === 2024) {
+            holidays['2024-02-09'] = '설날 대체공휴일';
+            holidays['2024-02-13'] = '설날 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-01-28'] = '설날 대체공휴일';
+            holidays['2025-02-01'] = '설날 대체공휴일';
+        } else if (year === 2026) {
+            holidays['2026-02-16'] = '설날 대체공휴일';
+            holidays['2026-02-20'] = '설날 대체공휴일';
+        }
+        
+        // 추석 대체공휴일
+        if (year === 2024) {
+            holidays['2024-09-15'] = '추석 대체공휴일';
+            holidays['2024-09-19'] = '추석 대체공휴일';
+        } else if (year === 2025) {
+            holidays['2025-10-04'] = '추석 대체공휴일';
+            holidays['2025-10-08'] = '추석 대체공휴일';
+        } else if (year === 2026) {
+            holidays['2026-09-23'] = '추석 대체공휴일';
+            holidays['2026-09-27'] = '추석 대체공휴일';
         }
         
         return holidays;
@@ -950,18 +1013,28 @@ class UI {
                 dayCell.classList.add('holiday');
             }
 
+            // 날짜 숫자와 공휴일 라벨을 가로로 배치할 컨테이너
+            const dayHeader = document.createElement('div');
+            dayHeader.style.display = 'flex';
+            dayHeader.style.alignItems = 'center';
+            dayHeader.style.marginBottom = '4px';
+            dayHeader.style.gap = '4px';
+            
             const dayNumber = document.createElement('div');
             dayNumber.className = 'day-number';
             dayNumber.textContent = currentDate.getDate();
-            dayCell.appendChild(dayNumber);
+            dayNumber.style.marginBottom = '0';
+            dayHeader.appendChild(dayNumber);
 
-            // 공휴일 이름 표시 (숫자 옆에)
+            // 공휴일 이름 표시 (숫자 옆에, 가로로 길게)
             if (holidayName) {
                 const holidayLabel = document.createElement('div');
                 holidayLabel.className = 'holiday-label';
                 holidayLabel.textContent = holidayName;
-                dayCell.appendChild(holidayLabel);
+                dayHeader.appendChild(holidayLabel);
             }
+            
+            dayCell.appendChild(dayHeader);
 
             // 해당 날짜의 예약 목록 가져오기
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
