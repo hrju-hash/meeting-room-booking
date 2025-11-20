@@ -1720,9 +1720,15 @@ ${booking.roomName ? `회의실: ${booking.roomName}` : ''}
                 }
             });
         } else {
-            const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+            // room은 사용하지 않지만 안전을 위해 확인
+            let room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+            if (!room) {
+                const localRooms = this.dataManager.loadRoomsFromLocal();
+                room = localRooms.find(r => r.id === booking.roomId);
+            }
+            
             details = `
-회의실: ${booking.roomName}
+            회의실: ${booking.roomName || (room ? room.name : `회의실 ${booking.roomId}`)}
 날짜: ${this.formatDate(booking.date)}
 시간: ${booking.startTime} ~ ${booking.endTime}
 예약자: ${booking.userName}
