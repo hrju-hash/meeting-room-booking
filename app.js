@@ -1,15 +1,74 @@
-// 데이터 관리
+// Firebase 데이터베이스 참조 가져오기
+function getDatabase() {
+    if (typeof firebase !== 'undefined' && firebase.database) {
+        return firebase.database();
+    }
+    return null;
+}
+
+// 데이터 관리 (Firebase Realtime Database 사용)
 class DataManager {
     constructor() {
-        this.rooms = this.loadRooms();
-        this.bookings = this.loadBookings();
-        this.zoomBookings = this.loadZoomBookings();
-        this.initDefaultRooms();
+        this.db = getDatabase();
+        this.rooms = [];
+        this.bookings = [];
+        this.zoomBookings = [];
+        this.callbacks = {
+            onRoomsUpdate: null,
+            onBookingsUpdate: null,
+            onZoomBookingsUpdate: null
+        };
+        
+        if (this.db) {
+            this.initFirebase();
+        } else {
+            // Firebase가 없으면 LocalStorage 사용 (폴백)
+            console.warn('Firebase가 초기화되지 않았습니다. LocalStorage를 사용합니다.');
+            this.rooms = this.loadRoomsFromLocal();
+            this.bookings = this.loadBookingsFromLocal();
+            this.zoomBookings = this.loadZoomBookingsFromLocal();
+            this.initDefaultRooms();
+        }
+    }
+
+    initFirebase() {
+        // Firebase Realtime Database 리스너 설정
+        const roomsRef = this.db.ref('rooms');
+        const bookingsRef = this.db.ref('bookings');
+        const zoomBookingsRef = this.db.ref('zoomBookings');
+
+        // 실시간 동기화
+        roomsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            this.rooms = data ? Object.values(data) : [];
+            if (this.rooms.length === 0) {
+                this.initDefaultRooms();
+            }
+            if (this.callbacks.onRoomsUpdate) {
+                this.callbacks.onRoomsUpdate(this.rooms);
+            }
+        });
+
+        bookingsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            this.bookings = data ? Object.values(data) : [];
+            if (this.callbacks.onBookingsUpdate) {
+                this.callbacks.onBookingsUpdate(this.bookings);
+            }
+        });
+
+        zoomBookingsRef.on('value', (snapshot) => {
+            const data = snapshot.val();
+            this.zoomBookings = data ? Object.values(data) : [];
+            if (this.callbacks.onZoomBookingsUpdate) {
+                this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
+            }
+        });
     }
 
     initDefaultRooms() {
         if (this.rooms.length === 0) {
-            this.rooms = [
+            const defaultRooms = [
                 {
                     id: 1,
                     name: '소회의실 A',
@@ -39,35 +98,78 @@ class DataManager {
                     facilities: ['프로젝터', '화이트보드', '전화', '음향시설']
                 }
             ];
-            this.saveRooms();
+            
+            if (this.db) {
+                // Firebase에 저장
+                this.db.ref('rooms').set(defaultRooms);
+            } else {
+                // LocalStorage에 저장
+                this.rooms = defaultRooms;
+                this.saveRoomsToLocal();
+            }
         }
     }
 
-    loadRooms() {
+    // LocalStorage 폴백 메서드
+    loadRoomsFromLocal() {
         const data = localStorage.getItem('meetingRooms');
         return data ? JSON.parse(data) : [];
     }
 
-    saveRooms() {
+    saveRoomsToLocal() {
         localStorage.setItem('meetingRooms', JSON.stringify(this.rooms));
     }
 
-    loadBookings() {
+    loadBookingsFromLocal() {
         const data = localStorage.getItem('meetingBookings');
         return data ? JSON.parse(data) : [];
     }
 
-    saveBookings() {
+    saveBookingsToLocal() {
         localStorage.setItem('meetingBookings', JSON.stringify(this.bookings));
     }
 
-    loadZoomBookings() {
+    loadZoomBookingsFromLocal() {
         const data = localStorage.getItem('zoomBookings');
         return data ? JSON.parse(data) : [];
     }
 
-    saveZoomBookings() {
+    saveZoomBookingsToLocal() {
         localStorage.setItem('zoomBookings', JSON.stringify(this.zoomBookings));
+    }
+
+    // Firebase 저장 메서드
+    saveRooms() {
+        if (this.db) {
+            this.db.ref('rooms').set(this.rooms);
+        } else {
+            this.saveRoomsToLocal();
+        }
+    }
+
+    saveBookings() {
+        if (this.db) {
+            // 배열을 객체로 변환 (Firebase는 배열 인덱스를 키로 사용)
+            const bookingsObj = {};
+            this.bookings.forEach(booking => {
+                bookingsObj[booking.id] = booking;
+            });
+            this.db.ref('bookings').set(bookingsObj);
+        } else {
+            this.saveBookingsToLocal();
+        }
+    }
+
+    saveZoomBookings() {
+        if (this.db) {
+            const zoomBookingsObj = {};
+            this.zoomBookings.forEach(booking => {
+                zoomBookingsObj[booking.id] = booking;
+            });
+            this.db.ref('zoomBookings').set(zoomBookingsObj);
+        } else {
+            this.saveZoomBookingsToLocal();
+        }
     }
 
     addBooking(booking) {
@@ -121,6 +223,19 @@ class DataManager {
         });
         return conflictingBookings.length === 0;
     }
+
+    // 콜백 설정 (UI 업데이트용)
+    setOnRoomsUpdate(callback) {
+        this.callbacks.onRoomsUpdate = callback;
+    }
+
+    setOnBookingsUpdate(callback) {
+        this.callbacks.onBookingsUpdate = callback;
+    }
+
+    setOnZoomBookingsUpdate(callback) {
+        this.callbacks.onZoomBookingsUpdate = callback;
+    }
 }
 
 // UI 관리
@@ -139,6 +254,21 @@ class UI {
         this.renderCalendar();
         this.setupModal();
         this.setupFAQ();
+        
+        // Firebase 실시간 업데이트 콜백 설정
+        if (this.dataManager.db) {
+            this.dataManager.setOnBookingsUpdate(() => {
+                this.renderBookings();
+                this.renderCalendar();
+            });
+            this.dataManager.setOnZoomBookingsUpdate(() => {
+                this.renderBookings();
+                this.renderCalendar();
+            });
+            this.dataManager.setOnRoomsUpdate(() => {
+                this.renderRooms();
+            });
+        }
     }
 
     setupEventListeners() {
