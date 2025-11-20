@@ -505,8 +505,6 @@ class UI {
                 e.stopPropagation();
                 e.stopImmediatePropagation();
                 console.log('🔵 예약하기 버튼 클릭 (onclick):', roomIdValue, roomNameValue);
-                alert('버튼 클릭됨! 모달을 엽니다...'); // 테스트용
-                
                 // 즉시 모달 열기 시도
                 try {
                     self.openBookingModal(roomIdValue);
