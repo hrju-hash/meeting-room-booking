@@ -794,22 +794,28 @@ form {
     color: #2563eb;
 }
 
+/* Day number container */
+.day-number-container {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
+}
 
-/* Holiday label */
+.day-number {
+    font-weight: 600;
+}
+
+/* Holiday label - 숫자 옆에 표시 */
 .holiday-label {
     background: #ef4444;
     color: white;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
-    margin-top: 4px;
-    text-align: center;
+    padding: 2px 6px;
+    border-radius: 3px;
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    width: 100%;
-    box-sizing: border-box;
-    display: block;
+    display: inline-block;
+    line-height: 1.2;
 }
 

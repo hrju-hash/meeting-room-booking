@@ -876,8 +876,11 @@ class UI {
         const substituteHolidays = this.calculateSubstituteHolidays(year, holidays);
         Object.assign(holidays, substituteHolidays);
         
-        // 2025년 10월 10일을 공휴일에서 명시적으로 제외
+        // 2025년 특별 처리
         if (year === 2025) {
+            // 2025년 10월 8일은 대체공휴일 (추석 연휴 대체)
+            holidays['2025-10-08'] = '대체공휴일';
+            // 2025년 10월 10일을 공휴일에서 명시적으로 제외
             delete holidays['2025-10-10'];
         }
         
@@ -994,18 +997,24 @@ class UI {
                 dayCell.classList.add('holiday');
             }
 
-            const dayNumber = document.createElement('div');
+            // 날짜와 공휴일 이름을 함께 표시하는 컨테이너
+            const dayNumberContainer = document.createElement('div');
+            dayNumberContainer.className = 'day-number-container';
+            
+            const dayNumber = document.createElement('span');
             dayNumber.className = 'day-number';
             dayNumber.textContent = currentDate.getDate();
-            dayCell.appendChild(dayNumber);
+            dayNumberContainer.appendChild(dayNumber);
 
-            // 공휴일 이름 표시
+            // 공휴일 이름 표시 (숫자 옆에)
             if (holidayName) {
-                const holidayLabel = document.createElement('div');
+                const holidayLabel = document.createElement('span');
                 holidayLabel.className = 'holiday-label';
                 holidayLabel.textContent = holidayName;
-                dayCell.appendChild(holidayLabel);
+                dayNumberContainer.appendChild(holidayLabel);
             }
+            
+            dayCell.appendChild(dayNumberContainer);
 
             // 해당 날짜의 예약 목록 가져오기
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
