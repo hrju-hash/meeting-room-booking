@@ -302,7 +302,7 @@ nav {
 
 /* Modal */
 .modal {
-    display: none;
+    display: none !important;
     position: fixed;
     top: 0;
     left: 0;
@@ -312,10 +312,17 @@ nav {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
 .modal.active {
-    display: flex;
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
 }
 
 .modal-content {
