@@ -876,6 +876,11 @@ class UI {
         const substituteHolidays = this.calculateSubstituteHolidays(year, holidays);
         Object.assign(holidays, substituteHolidays);
         
+        // 2025년 10월 10일을 공휴일에서 명시적으로 제외
+        if (year === 2025) {
+            delete holidays['2025-10-10'];
+        }
+        
         return holidays;
     }
 
