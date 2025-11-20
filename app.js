@@ -834,44 +834,50 @@ class UI {
     }
 
     getKoreanHolidays(year) {
-        // 한국 공휴일 목록 (2024-2026 기준)
-        const holidays = [];
+        // 한국 공휴일 목록 (날짜: 이름)
+        const holidays = {};
         
         // 고정 공휴일
-        holidays.push(`${year}-01-01`); // 신정
-        holidays.push(`${year}-03-01`); // 삼일절
-        holidays.push(`${year}-05-05`); // 어린이날
-        holidays.push(`${year}-06-06`); // 현충일
-        holidays.push(`${year}-08-15`); // 광복절
-        holidays.push(`${year}-10-03`); // 개천절
-        holidays.push(`${year}-10-09`); // 한글날
-        holidays.push(`${year}-12-25`); // 크리스마스
+        holidays[`${year}-01-01`] = '신정';
+        holidays[`${year}-03-01`] = '삼일절';
+        holidays[`${year}-05-05`] = '어린이날';
+        holidays[`${year}-06-06`] = '현충일';
+        holidays[`${year}-08-15`] = '광복절';
+        holidays[`${year}-10-03`] = '개천절';
+        holidays[`${year}-10-09`] = '한글날';
+        holidays[`${year}-12-25`] = '성탄절';
         
         // 음력 공휴일 (2024-2026 기준)
         if (year === 2024) {
-            holidays.push('2024-02-10'); // 설날
-            holidays.push('2024-02-11'); // 설날
-            holidays.push('2024-02-12'); // 설날
-            holidays.push('2024-09-16'); // 추석
-            holidays.push('2024-09-17'); // 추석
-            holidays.push('2024-09-18'); // 추석
+            holidays['2024-02-10'] = '설날';
+            holidays['2024-02-11'] = '설날';
+            holidays['2024-02-12'] = '설날';
+            holidays['2024-09-16'] = '추석';
+            holidays['2024-09-17'] = '추석';
+            holidays['2024-09-18'] = '추석';
         } else if (year === 2025) {
-            holidays.push('2025-01-29'); // 설날
-            holidays.push('2025-01-30'); // 설날
-            holidays.push('2025-01-31'); // 설날
-            holidays.push('2025-10-05'); // 추석
-            holidays.push('2025-10-06'); // 추석
-            holidays.push('2025-10-07'); // 추석
+            holidays['2025-01-29'] = '설날';
+            holidays['2025-01-30'] = '설날';
+            holidays['2025-01-31'] = '설날';
+            holidays['2025-10-05'] = '추석';
+            holidays['2025-10-06'] = '추석';
+            holidays['2025-10-07'] = '추석';
         } else if (year === 2026) {
-            holidays.push('2026-02-17'); // 설날
-            holidays.push('2026-02-18'); // 설날
-            holidays.push('2026-02-19'); // 설날
-            holidays.push('2026-09-24'); // 추석
-            holidays.push('2026-09-25'); // 추석
-            holidays.push('2026-09-26'); // 추석
+            holidays['2026-02-17'] = '설날';
+            holidays['2026-02-18'] = '설날';
+            holidays['2026-02-19'] = '설날';
+            holidays['2026-09-24'] = '추석';
+            holidays['2026-09-25'] = '추석';
+            holidays['2026-09-26'] = '추석';
         }
         
         return holidays;
+    }
+
+    getHolidayName(dateStr) {
+        const year = parseInt(dateStr.split('-')[0]);
+        const holidays = this.getKoreanHolidays(year);
+        return holidays[dateStr] || null;
     }
 
     isHoliday(dateStr) {
