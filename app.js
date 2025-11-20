@@ -924,18 +924,20 @@ class UI {
         if (zoomCheckboxGroup) {
             if (roomId) {
                 zoomCheckboxGroup.style.display = 'block';
-                console.log('줌 체크박스 그룹 표시 (roomId 있음)');
+                console.log('✅ 줌 체크박스 그룹 표시 (roomId 있음):', roomId);
             } else {
                 zoomCheckboxGroup.style.display = 'none';
                 console.log('줌 체크박스 그룹 숨김 (roomId 없음)');
             }
         } else {
-            console.warn('zoom-checkbox-group 요소를 찾을 수 없습니다!');
+            console.error('❌ zoom-checkbox-group 요소를 찾을 수 없습니다!');
         }
         
         const bookingZoom = document.getElementById('booking-zoom');
         if (bookingZoom) {
             bookingZoom.checked = false;
+        } else {
+            console.error('❌ booking-zoom 요소를 찾을 수 없습니다!');
         }
 
         // 회의실 선택 변경 이벤트 추가
@@ -946,13 +948,21 @@ class UI {
             if (zoomCheckboxGroup) {
                 if (selectedValue && selectedValue !== '') {
                     zoomCheckboxGroup.style.display = 'block';
-                    console.log('줌 체크박스 그룹 표시 (회의실 선택됨)');
+                    console.log('✅ 줌 체크박스 그룹 표시 (회의실 선택됨):', selectedValue);
                 } else {
                     zoomCheckboxGroup.style.display = 'none';
                     console.log('줌 체크박스 그룹 숨김 (회의실 선택 안됨)');
                 }
             }
         };
+        
+        // roomId가 있으면 즉시 줌 체크박스 표시 (강제)
+        if (roomId && zoomCheckboxGroup) {
+            setTimeout(() => {
+                zoomCheckboxGroup.style.display = 'block';
+                console.log('✅ 줌 체크박스 그룹 강제 표시 (roomId:', roomId, ')');
+            }, 100);
+        }
 
         // 시간 선택 초기화
         document.getElementById('booking-start-hour').value = '';
