@@ -722,7 +722,15 @@ class UI {
                 });
             } else {
                 // 회의실 예약 카드
-                const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+                // 회의실 정보 찾기 (Firebase 또는 LocalStorage에서)
+                let room = this.dataManager.rooms.find(r => r.id === booking.roomId);
+                if (!room) {
+                    const localRooms = this.dataManager.loadRoomsFromLocal();
+                    room = localRooms.find(r => r.id === booking.roomId);
+                }
+                if (!room) {
+                    room = { id: booking.roomId, name: `회의실 ${booking.roomId}` };
+                }
                 card.innerHTML = `
                     <div class="booking-info">
                         <h3>${booking.roomName}</h3>
@@ -1289,13 +1297,34 @@ class UI {
             return;
         }
 
-        const room = this.dataManager.rooms.find(r => r.id === roomId);
+        // 회의실 정보 찾기 (Firebase 또는 LocalStorage에서)
+        let room = this.dataManager.rooms.find(r => r.id === roomId);
+        
+        // Firebase 데이터가 없으면 LocalStorage에서 찾기
+        if (!room) {
+            const localRooms = this.dataManager.loadRoomsFromLocal();
+            room = localRooms.find(r => r.id === roomId);
+        }
+        
+        // 여전히 없으면 기본 회의실 정보 사용
+        if (!room) {
+            console.warn('회의실 정보를 찾을 수 없습니다. 기본 정보를 사용합니다. roomId:', roomId);
+            const defaultRooms = [
+                { id: 1, name: '소회의실 A' },
+                { id: 2, name: '소회의실 B' },
+                { id: 3, name: '소회의실 C' },
+                { id: 4, name: '대회의실' }
+            ];
+            room = defaultRooms.find(r => r.id === roomId) || { id: roomId, name: `회의실 ${roomId}` };
+        }
+        
+        console.log('회의실 정보:', room);
         
         const useZoom = document.getElementById('booking-zoom') && document.getElementById('booking-zoom').checked;
 
         const booking = {
             roomId,
-            roomName: room.name,
+            roomName: room.name || `회의실 ${roomId}`,
             date,
             startTime,
             endTime,
