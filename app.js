@@ -142,6 +142,15 @@ class UI {
     }
 
     setupEventListeners() {
+        // 로고 클릭 시 목록 화면으로 이동
+        const logo = document.querySelector('.logo');
+        if (logo) {
+            logo.style.cursor = 'pointer';
+            logo.addEventListener('click', () => {
+                this.switchPage('calendar');
+            });
+        }
+
         // 네비게이션
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.addEventListener('click', (e) => {
@@ -337,8 +346,8 @@ class UI {
                     <button class="btn-danger" data-zoom-booking-id="${booking.id}">취소</button>
                 `;
                 
-                card.querySelector('.btn-danger').addEventListener('click', () => {
-                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                card.querySelector('.btn-danger').addEventListener('click', async () => {
+                    if (await customConfirm('정말 예약을 취소하시겠습니까?')) {
                         this.cancelZoomBooking(booking.id);
                     }
                 });
@@ -359,8 +368,8 @@ class UI {
                     <button class="btn-danger" data-booking-id="${booking.id}">취소</button>
                 `;
                 
-                card.querySelector('.btn-danger').addEventListener('click', () => {
-                    if (confirm('정말 예약을 취소하시겠습니까?')) {
+                card.querySelector('.btn-danger').addEventListener('click', async () => {
+                    if (await customConfirm('정말 예약을 취소하시겠습니까?')) {
                         this.cancelBooking(booking.id);
                     }
                 });
@@ -1094,9 +1103,11 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
 ${booking.roomName ? `회의실: ${booking.roomName}` : ''}
             `.trim();
             
-            if (confirm(details + '\n\n예약을 취소하시겠습니까?')) {
-                this.cancelZoomBooking(booking.id);
-            }
+            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then((confirmed) => {
+                if (confirmed) {
+                    this.cancelZoomBooking(booking.id);
+                }
+            });
         } else {
             const room = this.dataManager.rooms.find(r => r.id === booking.roomId);
             details = `
@@ -1108,9 +1119,11 @@ ${booking.attendees ? `참석자: ${booking.attendees}` : ''}
 ${booking.purpose ? `목적: ${booking.purpose}` : ''}
             `.trim();
             
-            if (confirm(details + '\n\n예약을 취소하시겠습니까?')) {
-                this.cancelBooking(booking.id);
-            }
+            customConfirm(details + '\n\n예약을 취소하시겠습니까?').then((confirmed) => {
+                if (confirmed) {
+                    this.cancelBooking(booking.id);
+                }
+            });
         }
     }
 
@@ -1144,6 +1157,44 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
             }
         });
     }
+}
+
+// 커스텀 confirm 함수
+function customConfirm(message) {
+    return new Promise((resolve) => {
+        const modal = document.getElementById('confirm-modal');
+        const messageEl = document.getElementById('confirm-message');
+        const okBtn = document.getElementById('confirm-ok-btn');
+        const cancelBtn = document.getElementById('confirm-cancel-btn');
+        
+        messageEl.textContent = message;
+        modal.classList.add('active');
+        
+        const cleanup = () => {
+            modal.classList.remove('active');
+            okBtn.onclick = null;
+            cancelBtn.onclick = null;
+        };
+        
+        okBtn.onclick = () => {
+            cleanup();
+            resolve(true);
+        };
+        
+        cancelBtn.onclick = () => {
+            cleanup();
+            resolve(false);
+        };
+        
+        // 모달 배경 클릭 시 취소
+        modal.addEventListener('click', function backdropClick(e) {
+            if (e.target === modal) {
+                cleanup();
+                resolve(false);
+                modal.removeEventListener('click', backdropClick);
+            }
+        });
+    });
 }
 
 // 앱 초기화

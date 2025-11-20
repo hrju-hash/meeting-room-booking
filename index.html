@@ -222,6 +222,21 @@
 
         <!-- 알림 메시지 -->
         <div id="notification" class="notification"></div>
+        
+        <!-- 확인 모달 -->
+        <div id="confirm-modal" class="modal">
+            <div class="modal-content" style="max-width: 400px;">
+                <div class="modal-header">
+                    <h2>맑은스페이스의 메시지</h2>
+                </div>
+                <div class="modal-body" id="confirm-message" style="white-space: pre-line; padding: 20px;">
+                </div>
+                <div class="form-actions" style="justify-content: flex-end; margin-top: 20px;">
+                    <button type="button" class="btn-secondary" id="confirm-cancel-btn">취소</button>
+                    <button type="button" class="btn-primary" id="confirm-ok-btn">확인</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 하단 담당자 정보 -->
