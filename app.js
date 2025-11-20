@@ -1382,19 +1382,59 @@ class UI {
     }
 
     closeBookingModal() {
-        document.getElementById('booking-modal').classList.remove('active');
+        const modal = document.getElementById('booking-modal');
+        if (!modal) {
+            console.error('booking-modal 요소를 찾을 수 없습니다!');
+            return;
+        }
+        
+        console.log('모달 닫기 시작');
+        
+        // 여러 방법으로 모달 닫기 시도
+        modal.classList.remove('active');
+        modal.style.display = 'none';
+        modal.style.visibility = 'hidden';
+        modal.style.opacity = '0';
+        modal.style.pointerEvents = 'none';
+        
+        // 폼 초기화
+        const form = document.getElementById('booking-form');
+        if (form) {
+            form.reset();
+        }
+        
         // 회의실 선택 다시 표시
-        document.getElementById('booking-room').closest('.form-group').style.display = 'block';
+        const roomGroup = document.getElementById('booking-room')?.closest('.form-group');
+        if (roomGroup) {
+            roomGroup.style.display = 'block';
+        }
+        
         // 줌 체크박스 숨기기
-        document.getElementById('zoom-checkbox-group').style.display = 'none';
-        document.getElementById('booking-zoom').checked = false;
+        const zoomGroup = document.getElementById('zoom-checkbox-group');
+        if (zoomGroup) {
+            zoomGroup.style.display = 'none';
+        }
+        
+        const zoomCheckbox = document.getElementById('booking-zoom');
+        if (zoomCheckbox) {
+            zoomCheckbox.checked = false;
+        }
+        
         // 날짜 필드 초기화
-        document.getElementById('booking-date').removeAttribute('readonly');
-        document.getElementById('booking-date').style.backgroundColor = '';
-        document.getElementById('booking-date').style.cursor = '';
+        const dateInput = document.getElementById('booking-date');
+        if (dateInput) {
+            dateInput.removeAttribute('readonly');
+            dateInput.style.backgroundColor = '';
+            dateInput.style.cursor = '';
+        }
+        
         // 회의실 선택 이벤트 리스너 제거
         const roomSelect = document.getElementById('booking-room');
-        roomSelect.onchange = null;
+        if (roomSelect) {
+            roomSelect.onchange = null;
+        }
+        
+        console.log('모달 닫기 완료');
     }
 
     submitBooking() {
@@ -1543,6 +1583,10 @@ class UI {
             }
         }
 
+        // 알림 먼저 표시
+        this.showNotification('예약이 완료되었습니다!');
+        
+        // 모달 닫기
         this.closeBookingModal();
         
         // 약간의 지연을 두고 렌더링 (Firebase 저장 완료 대기)
@@ -1557,8 +1601,6 @@ class UI {
             this.renderBookings();
             this.renderCalendar();
         }, 1000);
-        
-        this.showNotification('예약이 완료되었습니다!');
     }
 
     cancelBooking(bookingId) {
