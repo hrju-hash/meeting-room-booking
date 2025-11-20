@@ -60,6 +60,8 @@ header {
     flex-shrink: 0;
     margin-right: 0;
     vertical-align: middle;
+    filter: none;
+    opacity: 1;
 }
 
 header h1 {
@@ -704,8 +706,12 @@ form {
     }
 
     .holiday-label {
-        font-size: 10px;
-        padding: 3px 6px;
+        font-size: 9px;
+        padding: 2px 5px;
+    }
+    
+    .day-number-container {
+        gap: 4px;
     }
 
     .calendar-event {
@@ -924,9 +930,10 @@ form {
 /* Day number container */
 .day-number-container {
     display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
+    flex-direction: row;
+    align-items: center;
+    gap: 6px;
+    flex-wrap: wrap;
     width: 100%;
 }
 
@@ -934,19 +941,16 @@ form {
     font-weight: 600;
 }
 
-/* Holiday label - 숫자 아래에 길게 표시 */
+/* Holiday label - 숫자 옆에 표시 */
 .holiday-label {
     background: #ef4444;
     color: white;
-    font-size: 11px;
+    font-size: 10px;
     font-weight: 600;
-    padding: 4px 8px;
-    border-radius: 4px;
+    padding: 2px 6px;
+    border-radius: 3px;
     white-space: nowrap;
-    display: block;
-    line-height: 1.4;
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
+    display: inline-block;
+    line-height: 1.2;
 }
 
