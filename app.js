@@ -486,23 +486,54 @@ class UI {
             bookBtn.setAttribute('data-room-id', room.id);
             bookBtn.setAttribute('data-room-name', room.name);
             
-            // 가장 간단하고 확실한 클릭 이벤트
-            bookBtn.onclick = (e) => {
+            // CSS 강제 설정 - 클릭 가능하도록
+            bookBtn.style.cursor = 'pointer';
+            bookBtn.style.pointerEvents = 'auto';
+            bookBtn.style.position = 'relative';
+            bookBtn.style.zIndex = '999';
+            bookBtn.style.userSelect = 'none';
+            bookBtn.style.touchAction = 'manipulation';
+            
+            // 가장 간단하고 확실한 클릭 이벤트 - 직접 함수 바인딩
+            const self = this;
+            const roomIdValue = room.id;
+            const roomNameValue = room.name;
+            
+            // onclick 이벤트
+            bookBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                const roomId = parseInt(bookBtn.getAttribute('data-room-id'));
-                const roomName = bookBtn.getAttribute('data-room-name');
-                console.log('예약하기 버튼 클릭 (onclick):', roomId, roomName);
+                e.stopImmediatePropagation();
+                console.log('🔵 예약하기 버튼 클릭 (onclick):', roomIdValue, roomNameValue);
+                alert('버튼 클릭됨! 모달을 엽니다...'); // 테스트용
                 
                 // 즉시 모달 열기 시도
-                setTimeout(() => {
-                    try {
-                        this.openBookingModal(roomId);
-                    } catch (error) {
-                        console.error('모달 열기 오류:', error);
-                        alert('예약 모달을 열 수 없습니다: ' + error.message);
-                    }
-                }, 0);
+                try {
+                    self.openBookingModal(roomIdValue);
+                } catch (error) {
+                    console.error('모달 열기 오류:', error);
+                    alert('예약 모달을 열 수 없습니다: ' + error.message);
+                }
+                return false;
+            };
+            
+            // mousedown 이벤트도 추가
+            bookBtn.onmousedown = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔵 예약하기 버튼 mousedown:', roomIdValue);
+            };
+            
+            // touchstart 이벤트 (모바일)
+            bookBtn.ontouchstart = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔵 예약하기 버튼 touchstart:', roomIdValue);
+                try {
+                    self.openBookingModal(roomIdValue);
+                } catch (error) {
+                    console.error('모달 열기 오류:', error);
+                }
             };
             
             card.appendChild(bookBtn);
@@ -891,19 +922,37 @@ class UI {
         document.getElementById('booking-date').style.cursor = '';
 
         // 줌 체크박스 표시 (회의실이 선택된 경우)
-        if (roomId) {
-            document.getElementById('zoom-checkbox-group').style.display = 'block';
+        const zoomCheckboxGroup = document.getElementById('zoom-checkbox-group');
+        if (zoomCheckboxGroup) {
+            if (roomId) {
+                zoomCheckboxGroup.style.display = 'block';
+                console.log('줌 체크박스 그룹 표시 (roomId 있음)');
+            } else {
+                zoomCheckboxGroup.style.display = 'none';
+                console.log('줌 체크박스 그룹 숨김 (roomId 없음)');
+            }
         } else {
-            document.getElementById('zoom-checkbox-group').style.display = 'none';
+            console.warn('zoom-checkbox-group 요소를 찾을 수 없습니다!');
         }
-        document.getElementById('booking-zoom').checked = false;
+        
+        const bookingZoom = document.getElementById('booking-zoom');
+        if (bookingZoom) {
+            bookingZoom.checked = false;
+        }
 
         // 회의실 선택 변경 이벤트 추가
         roomSelect.onchange = () => {
-            if (roomSelect.value && roomSelect.value !== '') {
-                document.getElementById('zoom-checkbox-group').style.display = 'block';
-            } else {
-                document.getElementById('zoom-checkbox-group').style.display = 'none';
+            const selectedValue = roomSelect.value;
+            console.log('회의실 선택 변경:', selectedValue);
+            
+            if (zoomCheckboxGroup) {
+                if (selectedValue && selectedValue !== '') {
+                    zoomCheckboxGroup.style.display = 'block';
+                    console.log('줌 체크박스 그룹 표시 (회의실 선택됨)');
+                } else {
+                    zoomCheckboxGroup.style.display = 'none';
+                    console.log('줌 체크박스 그룹 숨김 (회의실 선택 안됨)');
+                }
             }
         };
 

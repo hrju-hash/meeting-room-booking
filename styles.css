@@ -124,6 +124,12 @@ nav {
 
 /* Buttons */
 .btn-primary {
+    position: relative !important;
+    z-index: 999 !important;
+    pointer-events: auto !important;
+    cursor: pointer !important;
+    user-select: none;
+    touch-action: manipulation;
     background: var(--primary-color);
     color: white;
     border: none;
