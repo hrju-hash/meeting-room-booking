@@ -482,9 +482,37 @@ class UI {
             bookBtn.style.marginTop = '16px';
             bookBtn.style.width = '100%';
             bookBtn.textContent = '예약하기';
-            bookBtn.addEventListener('click', () => {
-                this.openBookingModal(room.id);
+            bookBtn.type = 'button'; // 폼 제출 방지
+            bookBtn.style.cursor = 'pointer';
+            bookBtn.style.pointerEvents = 'auto';
+            bookBtn.style.zIndex = '10';
+            bookBtn.style.position = 'relative';
+            
+            // 클릭 이벤트 강화
+            bookBtn.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('예약하기 버튼 클릭:', room.id, room.name);
+                try {
+                    this.openBookingModal(room.id);
+                } catch (error) {
+                    console.error('모달 열기 오류:', error);
+                    alert('예약 모달을 열 수 없습니다. 콘솔을 확인해주세요.');
+                }
             });
+            
+            // 터치 이벤트도 지원 (모바일)
+            bookBtn.addEventListener('touchstart', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('예약하기 버튼 터치:', room.id, room.name);
+                try {
+                    this.openBookingModal(room.id);
+                } catch (error) {
+                    console.error('모달 열기 오류:', error);
+                }
+            });
+            
             card.appendChild(bookBtn);
             
             grid.appendChild(card);
@@ -789,8 +817,19 @@ class UI {
     }
 
     openBookingModal(roomId = null) {
+        console.log('openBookingModal 호출:', roomId);
         const modal = document.getElementById('booking-modal');
+        if (!modal) {
+            console.error('booking-modal 요소를 찾을 수 없습니다!');
+            alert('예약 모달을 찾을 수 없습니다. 페이지를 새로고침해주세요.');
+            return;
+        }
+        
         const form = document.getElementById('booking-form');
+        if (!form) {
+            console.error('booking-form 요소를 찾을 수 없습니다!');
+            return;
+        }
         form.reset();
 
         // 모달 제목 변경
