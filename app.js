@@ -1135,6 +1135,9 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
             // 기존 이벤트 리스너 제거를 위해 새로 설정
             const question = item.querySelector('.faq-question');
             if (question) {
+                // 기존 이벤트 리스너 제거 (이벤트 위임 사용)
+                question.onclick = null;
+                
                 // 클릭 이벤트 리스너 추가
                 question.addEventListener('click', function(e) {
                     e.stopPropagation();
@@ -1153,7 +1156,7 @@ ${booking.purpose ? `목적: ${booking.purpose}` : ''}
                     } else {
                         item.classList.add('active');
                     }
-                });
+                }, { once: false });
             }
         });
     }
