@@ -1120,17 +1120,29 @@ class UI {
         document.getElementById('booking-end').value = '';
         document.getElementById('booking-attendees').value = '';
 
-        // 모달 표시
+        // 모달 표시 - 여러 방법으로 시도
+        console.log('줌 모달 표시 시도...');
         modal.classList.add('active');
-        console.log('줌 모달 열기 완료:', modal.classList.contains('active'));
+        modal.style.display = 'flex';
+        modal.style.visibility = 'visible';
+        modal.style.opacity = '1';
         
-        // 모달이 실제로 표시되는지 확인
+        console.log('줌 모달 상태:', {
+            hasActive: modal.classList.contains('active'),
+            display: modal.style.display,
+            visibility: modal.style.visibility,
+            opacity: modal.style.opacity
+        });
+        
+        // 모달이 실제로 표시되는지 확인 및 재시도
         setTimeout(() => {
             if (!modal.classList.contains('active')) {
-                console.warn('줌 모달이 열리지 않았습니다. 강제로 다시 시도합니다.');
+                console.warn('⚠️ 줌 모달이 열리지 않았습니다. 강제로 다시 시도합니다.');
                 modal.classList.add('active');
+                modal.style.display = 'flex';
             }
-        }, 100);
+            console.log('✅ 줌 모달 열기 완료');
+        }, 50);
     }
 
     closeBookingModal() {
