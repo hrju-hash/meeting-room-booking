@@ -877,7 +877,7 @@ class UI {
     isHoliday(dateStr) {
         const year = parseInt(dateStr.split('-')[0]);
         const holidays = this.getKoreanHolidays(year);
-        return holidays.includes(dateStr);
+        return holidays.hasOwnProperty(dateStr);
     }
 
     renderCalendar() {
