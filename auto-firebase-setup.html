@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase 완전 자동 설정</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+            text-align: center;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .step-title {
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 18px;
+        }
+        .auto-button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 10px;
+            transition: all 0.3s;
+        }
+        .auto-button:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .auto-button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+        }
+        .status.info {
+            background: #bee3f8;
+            color: #2c5282;
+            display: block;
+        }
+        .code {
+            background: #2d2d2d;
+            color: #f8f8f2;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-top: 10px;
+            overflow-x: auto;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔥 Firebase 완전 자동 설정</h1>
+        
+        <div class="step">
+            <div class="step-title">1단계: Firebase 프로젝트 생성</div>
+            <p style="color: #666; margin-bottom: 10px;">
+                아래 버튼을 클릭하면 Firebase 콘솔이 열립니다.<br>
+                프로젝트 이름을 <strong>malgn-booking</strong>으로 입력하고 생성하세요.
+            </p>
+            <button class="auto-button" onclick="openFirebaseConsole()">
+                🚀 Firebase 콘솔 열기 (자동)
+            </button>
+            <div id="step1-status" class="status"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">2단계: Realtime Database 생성</div>
+            <p style="color: #666; margin-bottom: 10px;">
+                데이터베이스를 생성하세요. 위치는 <strong>asia-northeast3</strong>를 선택하세요.
+            </p>
+            <button class="auto-button" onclick="openDatabaseSetup()" id="step2-btn" disabled>
+                📊 데이터베이스 설정 가이드 열기
+            </button>
+            <div id="step2-status" class="status"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">3단계: 웹 앱 등록 및 구성 정보 가져오기</div>
+            <p style="color: #666; margin-bottom: 10px;">
+                웹 앱을 등록하고 구성 정보를 복사하세요.
+            </p>
+            <button class="auto-button" onclick="openWebAppSetup()" id="step3-btn" disabled>
+                🌐 웹 앱 설정 가이드 열기
+            </button>
+            <div id="step3-status" class="status"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">4단계: 구성 정보 입력 및 자동 저장</div>
+            <p style="color: #666; margin-bottom: 10px;">
+                Firebase 콘솔에서 복사한 구성 정보를 아래에 붙여넣으세요.
+            </p>
+            <textarea 
+                id="config-input" 
+                placeholder="const firebaseConfig = { apiKey: '...', ... };" 
+                style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-family: monospace; font-size: 12px; min-height: 150px; margin-bottom: 10px;"
+            ></textarea>
+            <button class="auto-button" onclick="saveAndDeploy()" id="step4-btn" disabled>
+                💾 저장 및 자동 배포
+            </button>
+            <div id="step4-status" class="status"></div>
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 1;
+
+        function openFirebaseConsole() {
+            window.open('https://console.firebase.google.com/?project=malgn-booking', '_blank');
+            document.getElementById('step1-status').className = 'status info';
+            document.getElementById('step1-status').textContent = '✅ Firebase 콘솔이 열렸습니다. 프로젝트를 생성한 후 다음 단계로 진행하세요.';
+            document.getElementById('step2-btn').disabled = false;
+        }
+
+        function openDatabaseSetup() {
+            window.open('https://console.firebase.google.com/project/malgn-booking/database', '_blank');
+            document.getElementById('step2-status').className = 'status info';
+            document.getElementById('step2-status').innerHTML = `
+                <strong>데이터베이스 생성 단계:</strong><br>
+                1. "데이터베이스 만들기" 클릭<br>
+                2. 위치: <strong>asia-northeast3 (Seoul)</strong> 선택<br>
+                3. 보안 규칙: <strong>테스트 모드로 시작</strong> 선택<br>
+                4. "규칙" 탭에서 아래 코드로 교체 후 "게시":<br>
+                <div class="code">{
+  "rules": {
+    ".read": true,
+    ".write": true
+  }
+}</div>
+            `;
+            document.getElementById('step3-btn').disabled = false;
+        }
+
+        function openWebAppSetup() {
+            window.open('https://console.firebase.google.com/project/malgn-booking/settings/general', '_blank');
+            document.getElementById('step3-status').className = 'status info';
+            document.getElementById('step3-status').innerHTML = `
+                <strong>웹 앱 등록 단계:</strong><br>
+                1. "앱" 섹션에서 웹 아이콘 (<code>&lt;/&gt;</code>) 클릭<br>
+                2. 앱 닉네임: <strong>malgn-booking-web</strong> 입력<br>
+                3. "Firebase Hosting도 설정하시겠습니까?" → <strong>체크 해제</strong><br>
+                4. "앱 등록" 클릭<br>
+                5. 표시되는 <code>firebaseConfig</code> 객체 <strong>전체 복사</strong><br>
+                6. 아래 입력란에 붙여넣기
+            `;
+            document.getElementById('step4-btn').disabled = false;
+        }
+
+        function saveAndDeploy() {
+            const configText = document.getElementById('config-input').value.trim();
+            
+            if (!configText) {
+                document.getElementById('step4-status').className = 'status error';
+                document.getElementById('step4-status').textContent = '❌ 구성 정보를 입력해주세요.';
+                return;
+            }
+
+            // firebase-config.js 파일 생성
+            let configContent = `// Firebase 설정 파일
+// Firebase 프로젝트에서 자동으로 생성된 구성 정보
+
+${configText}
+
+// Firebase 초기화
+let firebaseInitialized = false;
+if (typeof firebase !== 'undefined') {
+    try {
+        firebase.initializeApp(firebaseConfig);
+        firebaseInitialized = true;
+        console.log('Firebase가 성공적으로 초기화되었습니다.');
+    } catch (error) {
+        console.error('Firebase 초기화 오류:', error);
+        console.warn('Firebase 구성 정보를 확인하세요. LocalStorage를 사용합니다.');
+    }
+} else {
+    console.error('Firebase SDK가 로드되지 않았습니다.');
+}
+`;
+
+            // 파일 다운로드
+            const blob = new Blob([configContent], { type: 'text/javascript' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'firebase-config.js';
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+
+            // 성공 메시지 및 배포 안내
+            document.getElementById('step4-status').className = 'status success';
+            document.getElementById('step4-status').innerHTML = `
+                ✅ <strong>구성 정보가 저장되었습니다!</strong><br><br>
+                <strong>다음 단계:</strong><br>
+                1. 다운로드된 <code>firebase-config.js</code> 파일을 프로젝트 폴더에 넣으세요<br>
+                2. 아래 명령을 실행하거나 <code>setup-and-deploy.bat</code> 파일을 실행하세요:<br>
+                <div class="code">git add firebase-config.js<br>git commit -m "Firebase 설정 추가"<br>git push</div>
+                <br>
+                또는 <code>setup-and-deploy.bat</code> 파일을 더블클릭하세요!
+            `;
+            document.getElementById('step4-btn').disabled = true;
+            document.getElementById('step4-btn').textContent = '✅ 완료!';
+        }
+
+        // 구성 정보 입력 감지
+        document.getElementById('config-input').addEventListener('input', function() {
+            if (this.value.trim().length > 0) {
+                document.getElementById('step4-btn').disabled = false;
+            } else {
+                document.getElementById('step4-btn').disabled = true;
+            }
+        });
+    </script>
+</body>
+</html>
+
