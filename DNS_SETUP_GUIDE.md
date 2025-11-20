@@ -31,7 +31,7 @@ Cloudflare Pages에서 커스텀 도메인을 설정하려면 DNS 레코드가 �
    - 다음 정보 입력:
      - **Type**: `CNAME`
      - **Name**: `malgn` (또는 `malgn.booking.com`의 서브도메인 부분)
-     - **Target**: `meeting-room-booking.pages.dev` 또는 Cloudflare Pages에서 제공하는 주소
+     - **Target**: `meeting-room-booking-6ml.pages.dev` (정확한 주소)
      - **Proxy status**: 🟠 Proxied (주황색 구름 아이콘)
      - **TTL**: Auto
    - **Save** 클릭
@@ -48,7 +48,7 @@ Cloudflare Pages에서 커스텀 도메인을 설정하려면 DNS 레코드가 �
 2. **CNAME 레코드 추가**
    - 레코드 타입: `CNAME`
    - 호스트/이름: `malgn` (또는 `malgn.booking.com`)
-   - 값/대상: `meeting-room-booking.pages.dev`
+   - 값/대상: `meeting-room-booking-6ml.pages.dev`
    - TTL: 3600 (또는 기본값)
 
 3. **저장 및 확인**
@@ -62,11 +62,11 @@ Cloudflare Pages에서 정확한 Target 주소를 확인하려면:
 
 2. **Custom domains 섹션 확인**
    - 도메인을 추가하려고 할 때 표시되는 Target 주소 확인
-   - 또는 프로젝트의 기본 주소 확인: `meeting-room-booking.pages.dev`
+   - 또는 프로젝트의 기본 주소 확인: `meeting-room-booking-6ml.pages.dev`
 
-3. **일반적인 형식**
-   - `meeting-room-booking.pages.dev`
-   - 또는 `[프로젝트이름].pages.dev`
+3. **정확한 주소**
+   - 현재 프로젝트 주소: `meeting-room-booking-6ml.pages.dev`
+   - 이 주소를 DNS 레코드의 Target으로 사용
 
 ## DNS 레코드 예시
 
@@ -75,7 +75,7 @@ Cloudflare Pages에서 정확한 Target 주소를 확인하려면:
 ```
 Type: CNAME
 Name: malgn
-Target: meeting-room-booking.pages.dev
+Target: meeting-room-booking-6ml.pages.dev
 Proxy: Proxied (🟠)
 TTL: Auto
 ```
@@ -85,7 +85,7 @@ TTL: Auto
 ```
 Type: CNAME
 Host: malgn
-Value: meeting-room-booking.pages.dev
+Value: meeting-room-booking-6ml.pages.dev
 TTL: 3600
 ```
 

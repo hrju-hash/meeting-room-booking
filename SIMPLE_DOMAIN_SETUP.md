@@ -1,7 +1,8 @@
 # 간단한 도메인 설정 - malgn.booking.com
 
 현재 배포 주소: `https://f30a20df.meeting-room-booking-6ml.pages.dev/`  
-변경할 주소: `http://malgn.booking.com`
+변경할 주소: `http://malgn.booking.com`  
+연결 대상: `meeting-room-booking-6ml.pages.dev`
 
 ## 가장 간단한 방법 (2분 소요)
 
