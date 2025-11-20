@@ -950,26 +950,18 @@ class UI {
                 dayCell.classList.add('holiday');
             }
 
-            // 날짜 숫자와 공휴일 라벨을 함께 표시할 컨테이너
-            const dayHeader = document.createElement('div');
-            dayHeader.style.display = 'flex';
-            dayHeader.style.alignItems = 'center';
-            dayHeader.style.marginBottom = '4px';
-            
             const dayNumber = document.createElement('div');
             dayNumber.className = 'day-number';
             dayNumber.textContent = currentDate.getDate();
-            dayHeader.appendChild(dayNumber);
+            dayCell.appendChild(dayNumber);
 
             // 공휴일 이름 표시 (숫자 옆에)
             if (holidayName) {
                 const holidayLabel = document.createElement('div');
                 holidayLabel.className = 'holiday-label';
                 holidayLabel.textContent = holidayName;
-                dayHeader.appendChild(holidayLabel);
+                dayCell.appendChild(holidayLabel);
             }
-            
-            dayCell.appendChild(dayHeader);
 
             // 해당 날짜의 예약 목록 가져오기
             const dayBookings = this.dataManager.bookings.filter(b => b.date === dateStr);
