@@ -190,8 +190,14 @@ class DataManager {
             this.bookings.forEach(booking => {
                 bookingsObj[booking.id] = booking;
             });
-            this.db.ref('bookings').set(bookingsObj);
+            console.log('Firebase에 예약 저장:', Object.keys(bookingsObj).length, '개');
+            this.db.ref('bookings').set(bookingsObj).then(() => {
+                console.log('Firebase 저장 완료');
+            }).catch((error) => {
+                console.error('Firebase 저장 오류:', error);
+            });
         } else {
+            console.log('LocalStorage에 예약 저장:', this.bookings.length, '개');
             this.saveBookingsToLocal();
         }
     }
@@ -375,7 +381,7 @@ class UI {
             // 약간의 지연을 두어 데이터가 로드될 시간을 줌
             setTimeout(() => {
                 this.renderBookings();
-            }, 100);
+            }, 200);
         } else if (page === 'calendar') {
             this.renderCalendar();
         } else if (page === 'faq') {
