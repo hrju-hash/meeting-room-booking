@@ -546,40 +546,52 @@ class UI {
             const roomIdValue = room.id;
             const roomNameValue = room.name;
             
-            // onclick 이벤트
+            // onclick 이벤트 (이벤트 위임과 함께 작동)
             bookBtn.onclick = function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                e.stopImmediatePropagation();
-                console.log('🔵 예약하기 버튼 클릭 (onclick):', roomIdValue, roomNameValue);
-                // 즉시 모달 열기 시도
+                console.log('🔵 예약하기 버튼 onclick:', roomIdValue, roomNameValue);
+                
                 try {
                     self.openBookingModal(roomIdValue);
                 } catch (error) {
-                    console.error('모달 열기 오류:', error);
+                    console.error('모달 열기 오류 (onclick):', error);
                     alert('예약 모달을 열 수 없습니다: ' + error.message);
                 }
                 return false;
             };
             
+            // addEventListener도 추가 (이중 보험) - 캡처 단계에서 실행
+            bookBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('🔵 예약하기 버튼 addEventListener:', roomIdValue, roomNameValue);
+                
+                try {
+                    self.openBookingModal(roomIdValue);
+                } catch (error) {
+                    console.error('모달 열기 오류 (addEventListener):', error);
+                }
+            }, true); // 캡처 단계에서 실행
+            
             // mousedown 이벤트도 추가
-            bookBtn.onmousedown = function(e) {
+            bookBtn.addEventListener('mousedown', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🔵 예약하기 버튼 mousedown:', roomIdValue);
-            };
+            });
             
             // touchstart 이벤트 (모바일)
-            bookBtn.ontouchstart = function(e) {
+            bookBtn.addEventListener('touchstart', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 console.log('🔵 예약하기 버튼 touchstart:', roomIdValue);
                 try {
                     self.openBookingModal(roomIdValue);
                 } catch (error) {
-                    console.error('모달 열기 오류:', error);
+                    console.error('모달 열기 오류 (touchstart):', error);
                 }
-            };
+            });
             
             card.appendChild(bookBtn);
             
