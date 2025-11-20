@@ -909,15 +909,35 @@ class UI {
 
     updateRoomFilterOptions() {
         const select = document.getElementById('filter-room');
+        if (!select) return;
+        
         const currentValue = select.value;
         select.innerHTML = '<option value="">전체 회의실</option>';
         
-        this.dataManager.rooms.forEach(room => {
-            const option = document.createElement('option');
-            option.value = room.id;
-            option.textContent = room.name;
-            select.appendChild(option);
-        });
+        // rooms가 배열이고 비어있지 않은지 확인
+        if (Array.isArray(this.dataManager.rooms) && this.dataManager.rooms.length > 0) {
+            this.dataManager.rooms.forEach(room => {
+                if (room && room.id && room.name) {
+                    const option = document.createElement('option');
+                    option.value = room.id;
+                    option.textContent = room.name;
+                    select.appendChild(option);
+                }
+            });
+        } else {
+            // LocalStorage에서 로드 시도
+            const localRooms = this.dataManager.loadRoomsFromLocal();
+            if (Array.isArray(localRooms) && localRooms.length > 0) {
+                localRooms.forEach(room => {
+                    if (room && room.id && room.name) {
+                        const option = document.createElement('option');
+                        option.value = room.id;
+                        option.textContent = room.name;
+                        select.appendChild(option);
+                    }
+                });
+            }
+        }
         
         select.value = currentValue;
     }
