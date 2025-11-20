@@ -62,7 +62,17 @@ class DataManager {
 
         bookingsRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            this.bookings = data ? Object.values(data) : [];
+            if (data) {
+                // Firebase는 객체로 저장되므로 배열로 변환
+                if (Array.isArray(data)) {
+                    this.bookings = data;
+                } else {
+                    this.bookings = Object.values(data);
+                }
+            } else {
+                this.bookings = [];
+            }
+            console.log('Firebase bookings 업데이트:', this.bookings.length, '개');
             if (this.callbacks.onBookingsUpdate) {
                 this.callbacks.onBookingsUpdate(this.bookings);
             }
@@ -70,7 +80,17 @@ class DataManager {
 
         zoomBookingsRef.on('value', (snapshot) => {
             const data = snapshot.val();
-            this.zoomBookings = data ? Object.values(data) : [];
+            if (data) {
+                // Firebase는 객체로 저장되므로 배열로 변환
+                if (Array.isArray(data)) {
+                    this.zoomBookings = data;
+                } else {
+                    this.zoomBookings = Object.values(data);
+                }
+            } else {
+                this.zoomBookings = [];
+            }
+            console.log('Firebase zoomBookings 업데이트:', this.zoomBookings.length, '개');
             if (this.callbacks.onZoomBookingsUpdate) {
                 this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
             }
@@ -345,7 +365,10 @@ class UI {
         });
 
         if (page === 'bookings') {
-            this.renderBookings();
+            // 약간의 지연을 두어 데이터가 로드될 시간을 줌
+            setTimeout(() => {
+                this.renderBookings();
+            }, 100);
         } else if (page === 'calendar') {
             this.renderCalendar();
         } else if (page === 'faq') {
