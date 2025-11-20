@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>예약 삭제 도구</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            max-width: 600px;
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 24px;
+        }
+        .info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            color: #666;
+        }
+        .booking-item {
+            background: #fff;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 10px;
+        }
+        .booking-item h3 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        .booking-details {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+        .delete-btn:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background: #c6f6d5;
+            color: #22543d;
+            display: block;
+        }
+        .status.error {
+            background: #fed7d7;
+            color: #742a2a;
+            display: block;
+        }
+        .status.info {
+            background: #bee3f8;
+            color: #2c5282;
+            display: block;
+        }
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid #f3f3f3;
+            border-top: 3px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-right: 10px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ 예약 삭제 도구</h1>
+        <div class="info">
+            <strong>2025-11-24</strong> 날짜의 예약을 삭제합니다.
+        </div>
+        <div id="bookings-list">
+            <div class="status info">예약 목록을 불러오는 중...</div>
+        </div>
+        <div id="status-message" class="status"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+    <script src="firebase-config.js"></script>
+
+    <script>
+        const targetDate = '2025-11-24';
+        let bookingsToDelete = [];
+        let zoomBookingsToDelete = [];
+
+        function initFirebase() {
+            if (typeof firebase === 'undefined' || !firebase.database) {
+                document.getElementById('status-message').className = 'status error';
+                document.getElementById('status-message').textContent = '❌ Firebase가 로드되지 않았습니다.';
+                return null;
+            }
+            return firebase.database();
+        }
+
+        function loadBookings() {
+            const db = initFirebase();
+            if (!db) return;
+
+            const bookingsRef = db.ref('bookings');
+            const zoomBookingsRef = db.ref('zoomBookings');
+
+            bookingsRef.once('value', (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const allBookings = Array.isArray(data) ? data : Object.values(data);
+                    bookingsToDelete = allBookings.filter(b => b.date && b.date.trim() === targetDate);
+                    console.log('찾은 예약:', bookingsToDelete);
+                }
+                loadZoomBookings();
+            });
+
+            function loadZoomBookings() {
+                zoomBookingsRef.once('value', (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        const allZoomBookings = Array.isArray(data) ? data : Object.values(data);
+                        zoomBookingsToDelete = allZoomBookings.filter(b => b.date && b.date.trim() === targetDate);
+                        console.log('찾은 줌 예약:', zoomBookingsToDelete);
+                    }
+                    displayBookings();
+                });
+            }
+        }
+
+        function displayBookings() {
+            const list = document.getElementById('bookings-list');
+            list.innerHTML = '';
+
+            if (bookingsToDelete.length === 0 && zoomBookingsToDelete.length === 0) {
+                list.innerHTML = '<div class="status info">해당 날짜에 예약이 없습니다.</div>';
+                return;
+            }
+
+            // 회의실 예약 표시
+            bookingsToDelete.forEach(booking => {
+                const item = document.createElement('div');
+                item.className = 'booking-item';
+                item.innerHTML = `
+                    <h3>${booking.roomName || '회의실 예약'}</h3>
+                    <div class="booking-details">
+                        <div><strong>날짜:</strong> ${booking.date}</div>
+                        <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                        <div><strong>예약자:</strong> ${booking.userName}</div>
+                        ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                        ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteBooking('${booking.id}')">삭제</button>
+                `;
+                list.appendChild(item);
+            });
+
+            // 줌 예약 표시
+            zoomBookingsToDelete.forEach(booking => {
+                const item = document.createElement('div');
+                item.className = 'booking-item';
+                item.innerHTML = `
+                    <h3>📹 줌 예약</h3>
+                    <div class="booking-details">
+                        <div><strong>날짜:</strong> ${booking.date}</div>
+                        <div><strong>시간:</strong> ${booking.startTime} ~ ${booking.endTime}</div>
+                        <div><strong>예약자:</strong> ${booking.userName}</div>
+                        ${booking.attendees ? `<div><strong>참석자:</strong> ${booking.attendees}</div>` : ''}
+                        ${booking.purpose ? `<div><strong>목적:</strong> ${booking.purpose}</div>` : ''}
+                        ${booking.roomName ? `<div><strong>회의실:</strong> ${booking.roomName}</div>` : ''}
+                    </div>
+                    <button class="delete-btn" onclick="deleteZoomBooking('${booking.id}')">삭제</button>
+                `;
+                list.appendChild(item);
+            });
+
+            // 전체 삭제 버튼
+            if (bookingsToDelete.length > 0 || zoomBookingsToDelete.length > 0) {
+                const allDeleteBtn = document.createElement('button');
+                allDeleteBtn.className = 'delete-btn';
+                allDeleteBtn.style.width = '100%';
+                allDeleteBtn.style.marginTop = '20px';
+                allDeleteBtn.textContent = `전체 삭제 (${bookingsToDelete.length + zoomBookingsToDelete.length}개)`;
+                allDeleteBtn.onclick = deleteAll;
+                list.appendChild(allDeleteBtn);
+            }
+        }
+
+        function deleteBooking(bookingId) {
+            if (!confirm('정말 이 예약을 삭제하시겠습니까?')) return;
+
+            const db = initFirebase();
+            if (!db) return;
+
+            const bookingRef = db.ref(`bookings/${bookingId}`);
+            bookingRef.remove()
+                .then(() => {
+                    console.log('예약 삭제 완료:', bookingId);
+                    bookingsToDelete = bookingsToDelete.filter(b => b.id !== bookingId);
+                    displayBookings();
+                    showStatus('success', '✅ 예약이 삭제되었습니다.');
+                })
+                .catch((error) => {
+                    console.error('삭제 오류:', error);
+                    showStatus('error', '❌ 삭제 중 오류가 발생했습니다: ' + error.message);
+                });
+        }
+
+        function deleteZoomBooking(bookingId) {
+            if (!confirm('정말 이 줌 예약을 삭제하시겠습니까?')) return;
+
+            const db = initFirebase();
+            if (!db) return;
+
+            const zoomBookingRef = db.ref(`zoomBookings/${bookingId}`);
+            zoomBookingRef.remove()
+                .then(() => {
+                    console.log('줌 예약 삭제 완료:', bookingId);
+                    zoomBookingsToDelete = zoomBookingsToDelete.filter(b => b.id !== bookingId);
+                    displayBookings();
+                    showStatus('success', '✅ 줌 예약이 삭제되었습니다.');
+                })
+                .catch((error) => {
+                    console.error('삭제 오류:', error);
+                    showStatus('error', '❌ 삭제 중 오류가 발생했습니다: ' + error.message);
+                });
+        }
+
+        function deleteAll() {
+            const totalCount = bookingsToDelete.length + zoomBookingsToDelete.length;
+            if (!confirm(`정말 ${totalCount}개의 예약을 모두 삭제하시겠습니까?`)) return;
+
+            const db = initFirebase();
+            if (!db) return;
+
+            const promises = [];
+
+            // 모든 회의실 예약 삭제
+            bookingsToDelete.forEach(booking => {
+                promises.push(db.ref(`bookings/${booking.id}`).remove());
+            });
+
+            // 모든 줌 예약 삭제
+            zoomBookingsToDelete.forEach(booking => {
+                promises.push(db.ref(`zoomBookings/${booking.id}`).remove());
+            });
+
+            Promise.all(promises)
+                .then(() => {
+                    console.log('모든 예약 삭제 완료');
+                    bookingsToDelete = [];
+                    zoomBookingsToDelete = [];
+                    displayBookings();
+                    showStatus('success', `✅ ${totalCount}개의 예약이 모두 삭제되었습니다.`);
+                })
+                .catch((error) => {
+                    console.error('삭제 오류:', error);
+                    showStatus('error', '❌ 삭제 중 오류가 발생했습니다: ' + error.message);
+                });
+        }
+
+        function showStatus(type, message) {
+            const statusEl = document.getElementById('status-message');
+            statusEl.className = `status ${type}`;
+            statusEl.textContent = message;
+            setTimeout(() => {
+                statusEl.className = 'status';
+            }, 5000);
+        }
+
+        // 페이지 로드 시 예약 목록 불러오기
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                loadBookings();
+            }, 1000); // Firebase 초기화 대기
+        });
+    </script>
+</body>
+</html>
+
