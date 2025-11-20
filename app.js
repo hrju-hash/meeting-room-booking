@@ -1487,10 +1487,26 @@ class UI {
             };
 
             this.dataManager.addZoomBooking(zoomBooking);
-            this.closeBookingModal();
-            this.renderBookings();
-            this.renderCalendar();
+            
+            // 알림 먼저 표시
             this.showNotification('줌 예약이 완료되었습니다!');
+            
+            // 모달 닫기
+            this.closeBookingModal();
+            
+            // 약간의 지연을 두고 렌더링 (Firebase 저장 완료 대기)
+            setTimeout(() => {
+                console.log('줌 예약 완료 후 렌더링 시작');
+                this.renderBookings();
+                this.renderCalendar();
+            }, 300);
+            
+            setTimeout(() => {
+                console.log('줌 예약 완료 후 렌더링 재시도');
+                this.renderBookings();
+                this.renderCalendar();
+            }, 1000);
+            
             return;
         }
 
