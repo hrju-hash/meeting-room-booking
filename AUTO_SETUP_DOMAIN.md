@@ -1,6 +1,8 @@
 # Cloudflare 커스텀 도메인 자동 설정 가이드
 
-## 방법 1: GitHub Actions 사용 (권장)
+⚠️ **중요**: Cloudflare API 토큰과 Account ID가 필요합니다.
+
+## 방법 1: GitHub Actions 사용 (가장 쉬움, 권장)
 
 ### 사전 준비
 
