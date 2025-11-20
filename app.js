@@ -549,9 +549,36 @@ class UI {
         zoomBookBtn.style.marginTop = '16px';
         zoomBookBtn.style.width = '100%';
         zoomBookBtn.textContent = '줌 예약';
-        zoomBookBtn.addEventListener('click', () => {
-            this.openZoomBookingModal();
+        zoomBookBtn.type = 'button';
+        zoomBookBtn.style.cursor = 'pointer';
+        zoomBookBtn.style.pointerEvents = 'auto';
+        zoomBookBtn.style.zIndex = '10';
+        zoomBookBtn.style.position = 'relative';
+        
+        zoomBookBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('줌 예약 버튼 클릭');
+            try {
+                this.openZoomBookingModal();
+            } catch (error) {
+                console.error('줌 모달 열기 오류:', error);
+                alert('줌 예약 모달을 열 수 없습니다. 콘솔을 확인해주세요.');
+            }
         });
+        
+        // 터치 이벤트도 지원
+        zoomBookBtn.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('줌 예약 버튼 터치');
+            try {
+                this.openZoomBookingModal();
+            } catch (error) {
+                console.error('줌 모달 열기 오류:', error);
+            }
+        });
+        
         zoomCard.appendChild(zoomBookBtn);
         
         grid.appendChild(zoomCard);
