@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>맑은스페이스 - 영상 데모</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f9fafb;
+            overflow: hidden;
+        }
+
+        .demo-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+
+        .scene {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background: white;
+            padding: 40px;
+        }
+
+        .scene.active {
+            display: flex;
+            animation: fadeIn 0.5s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .logo-large {
+            width: 120px;
+            height: 120px;
+            margin-bottom: 30px;
+            animation: scaleIn 0.8s ease-out;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        h1 {
+            font-size: 48px;
+            font-weight: 700;
+            color: #4f46e5;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 36px;
+            font-weight: 600;
+            color: #111827;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        .subtitle {
+            font-size: 24px;
+            color: #6b7280;
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .message-box {
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 10px;
+            max-width: 400px;
+            border-left: 4px solid #4f46e5;
+        }
+
+        .message-box .time {
+            font-size: 12px;
+            color: #9ca3af;
+            margin-bottom: 5px;
+        }
+
+        .message-box .text {
+            font-size: 14px;
+            color: #111827;
+        }
+
+        .messenger-container {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 500px;
+            width: 100%;
+        }
+
+        .calendar-demo {
+            background: white;
+            border-radius: 16px;
+            padding: 40px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .calendar-day {
+            aspect-ratio: 1;
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            font-weight: 600;
+            position: relative;
+        }
+
+        .calendar-day.holiday {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .calendar-day.booked {
+            background: #e0e7ff;
+            color: #4f46e5;
+        }
+
+        .calendar-day.selected {
+            background: #4f46e5;
+            color: white;
+            animation: pulse 1s ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .feature-list {
+            list-style: none;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .feature-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            font-size: 20px;
+        }
+
+        .feature-item .icon {
+            font-size: 32px;
+            margin-right: 20px;
+        }
+
+        .cta-button {
+            background: #4f46e5;
+            color: white;
+            padding: 16px 32px;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-top: 30px;
+            transition: all 0.3s;
+        }
+
+        .cta-button:hover {
+            background: #4338ca;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.4);
+        }
+
+        .url-display {
+            background: #f3f4f6;
+            padding: 15px 25px;
+            border-radius: 8px;
+            font-size: 18px;
+            color: #4f46e5;
+            font-weight: 600;
+            margin-top: 20px;
+            font-family: monospace;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 4px;
+            background: #4f46e5;
+            transition: width 0.1s linear;
+            z-index: 1000;
+        }
+
+        .scene-number {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.5);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="progress-bar" id="progress"></div>
+    <div class="demo-container">
+        
+        <!-- 씬 1: 오프닝 -->
+        <div class="scene active" id="scene1">
+            <div class="scene-number">1 / 6</div>
+            <img src="logo.jpg" alt="로고" class="logo-large">
+            <h1>맑은스페이스</h1>
+            <p class="subtitle">스마트한 회의실 예약 시스템</p>
+        </div>
+
+        <!-- 씬 2: 문제점 제시 -->
+        <div class="scene" id="scene2">
+            <div class="scene-number">2 / 6</div>
+            <h2>회의실 예약, 이제 더 이상 메신저로 공유하지 마세요!</h2>
+            <div class="messenger-container">
+                <div class="message-box">
+                    <div class="time">오후 2:30</div>
+                    <div class="text">오늘 오후 2시 회의실 사용 예정</div>
+                </div>
+                <div class="message-box">
+                    <div class="time">오후 2:32</div>
+                    <div class="text">줌 쓸 예정입니다</div>
+                </div>
+                <div class="message-box">
+                    <div class="time">오후 2:35</div>
+                    <div class="text">회의실 예약했어요</div>
+                </div>
+                <div class="message-box" style="border-left-color: #ef4444;">
+                    <div class="time">오후 2:36</div>
+                    <div class="text">어? 저도 예약했는데요? 😱</div>
+                </div>
+            </div>
+            <p class="subtitle" style="margin-top: 30px;">중복 예약, 시간 충돌, 예약 현황 파악 어려움...</p>
+        </div>
+
+        <!-- 씬 3: 솔루션 소개 -->
+        <div class="scene" id="scene3">
+            <div class="scene-number">3 / 6</div>
+            <h2>맑은스페이스로 모든 회의실 예약을 한눈에!</h2>
+            <div class="calendar-demo">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h3 style="font-size: 24px; color: #4f46e5;">2025년 10월</h3>
+                </div>
+                <div class="calendar-grid">
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">일</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">월</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">화</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">수</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">목</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">금</div>
+                    <div class="calendar-day" style="background: #4f46e5; color: white;">토</div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day"></div>
+                    <div class="calendar-day">1</div>
+                    <div class="calendar-day">2</div>
+                    <div class="calendar-day">3</div>
+                    <div class="calendar-day">4</div>
+                    <div class="calendar-day">5</div>
+                    <div class="calendar-day holiday">6</div>
+                    <div class="calendar-day holiday">7</div>
+                    <div class="calendar-day holiday">8</div>
+                    <div class="calendar-day">9</div>
+                    <div class="calendar-day holiday">10</div>
+                    <div class="calendar-day">11</div>
+                    <div class="calendar-day">12</div>
+                    <div class="calendar-day">13</div>
+                    <div class="calendar-day">14</div>
+                    <div class="calendar-day">15</div>
+                    <div class="calendar-day">16</div>
+                    <div class="calendar-day">17</div>
+                    <div class="calendar-day">18</div>
+                    <div class="calendar-day">19</div>
+                    <div class="calendar-day">20</div>
+                    <div class="calendar-day booked">21</div>
+                    <div class="calendar-day">22</div>
+                    <div class="calendar-day">23</div>
+                    <div class="calendar-day">24</div>
+                    <div class="calendar-day">25</div>
+                    <div class="calendar-day">26</div>
+                    <div class="calendar-day">27</div>
+                    <div class="calendar-day">28</div>
+                    <div class="calendar-day">29</div>
+                    <div class="calendar-day">30</div>
+                    <div class="calendar-day">31</div>
+                </div>
+                <p class="subtitle" style="margin-top: 30px; font-size: 18px;">
+                    직관적인 달력에서 날짜를 선택하고<br>
+                    회의실과 시간을 간편하게 예약하세요
+                </p>
+            </div>
+        </div>
+
+        <!-- 씬 4: 주요 기능 -->
+        <div class="scene" id="scene4">
+            <div class="scene-number">4 / 6</div>
+            <h2>주요 기능</h2>
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <span class="icon">✨</span>
+                    <span>실시간 예약 현황 확인</span>
+                </li>
+                <li class="feature-item">
+                    <span class="icon">✨</span>
+                    <span>중복 예약 자동 방지</span>
+                </li>
+                <li class="feature-item">
+                    <span class="icon">✨</span>
+                    <span>내 예약 목록 한눈에 보기</span>
+                </li>
+                <li class="feature-item">
+                    <span class="icon">✨</span>
+                    <span>공휴일 자동 표시</span>
+                </li>
+                <li class="feature-item">
+                    <span class="icon">✨</span>
+                    <span>줌 계정도 함께 예약</span>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 씬 5: 모바일 지원 -->
+        <div class="scene" id="scene5">
+            <div class="scene-number">5 / 6</div>
+            <h2>모바일에서도 언제 어디서나</h2>
+            <p class="subtitle">간편하게 예약하고 확인하세요</p>
+            <div style="background: #f3f4f6; border-radius: 24px; padding: 20px; margin-top: 30px; max-width: 300px;">
+                <div style="background: white; border-radius: 16px; padding: 30px; text-align: center;">
+                    <div style="font-size: 48px; margin-bottom: 20px;">📱</div>
+                    <div style="font-size: 18px; color: #4f46e5; font-weight: 600;">반응형 디자인</div>
+                    <div style="font-size: 14px; color: #6b7280; margin-top: 10px;">모든 기기에서 완벽하게 작동</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 씬 6: 마무리 -->
+        <div class="scene" id="scene6">
+            <div class="scene-number">6 / 6</div>
+            <img src="logo.jpg" alt="로고" class="logo-large">
+            <h1>맑은스페이스</h1>
+            <p class="subtitle">스마트한 회의실 예약 시스템</p>
+            <div class="url-display">malgn-booking.pages.dev</div>
+            <button class="cta-button" onclick="window.open('https://malgn-booking.pages.dev', '_blank')">
+                지금 시작하기
+            </button>
+            <p class="subtitle" style="margin-top: 40px; font-size: 20px;">
+                이제 메신저 대신 맑은스페이스를 사용하세요!
+            </p>
+        </div>
+
+    </div>
+
+    <script>
+        const scenes = document.querySelectorAll('.scene');
+        const progressBar = document.getElementById('progress');
+        let currentScene = 0;
+        const sceneDuration = 10000; // 각 씬 10초
+        const totalDuration = scenes.length * sceneDuration;
+        let startTime = Date.now();
+
+        function showScene(index) {
+            scenes.forEach((scene, i) => {
+                scene.classList.toggle('active', i === index);
+            });
+        }
+
+        function updateProgress() {
+            const elapsed = Date.now() - startTime;
+            const progress = (elapsed % totalDuration) / totalDuration * 100;
+            progressBar.style.width = progress + '%';
+        }
+
+        function nextScene() {
+            currentScene = (currentScene + 1) % scenes.length;
+            showScene(currentScene);
+        }
+
+        // 자동 재생
+        setInterval(() => {
+            nextScene();
+        }, sceneDuration);
+
+        // 진행 바 업데이트
+        setInterval(updateProgress, 100);
+
+        // 키보드로 수동 제어 (선택사항)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') {
+                nextScene();
+                startTime = Date.now();
+            } else if (e.key === 'ArrowLeft') {
+                currentScene = (currentScene - 1 + scenes.length) % scenes.length;
+                showScene(currentScene);
+                startTime = Date.now();
+            } else if (e.key === ' ') {
+                // 스페이스바로 일시정지/재생 (구현 가능)
+            }
+        });
+
+        // 초기화
+        showScene(0);
+    </script>
+</body>
+</html>
+
