@@ -390,6 +390,53 @@ class UI {
                 this.switchPage(page);
             });
         });
+        
+        // 이벤트 위임: rooms-grid의 모든 버튼 클릭 처리
+        const roomsGrid = document.getElementById('rooms-grid');
+        if (roomsGrid) {
+            // 기존 이벤트 리스너 제거 (중복 방지)
+            const existingHandler = roomsGrid._bookingClickHandler;
+            if (existingHandler) {
+                roomsGrid.removeEventListener('click', existingHandler);
+            }
+            
+            // 이벤트 위임으로 버튼 클릭 처리
+            const bookingClickHandler = (e) => {
+                const button = e.target.closest('button.btn-primary');
+                if (!button) return;
+                
+                const roomId = button.getAttribute('data-room-id');
+                const roomName = button.getAttribute('data-room-name');
+                
+                if (roomId && button.textContent === '예약하기') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔵 이벤트 위임으로 예약하기 버튼 클릭:', roomId, roomName);
+                    
+                    try {
+                        this.openBookingModal(parseInt(roomId));
+                    } catch (error) {
+                        console.error('모달 열기 오류:', error);
+                        alert('예약 모달을 열 수 없습니다: ' + error.message);
+                    }
+                } else if (button.textContent === '줌 예약') {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    console.log('🔵 이벤트 위임으로 줌 예약 버튼 클릭');
+                    
+                    try {
+                        this.openZoomBookingModal();
+                    } catch (error) {
+                        console.error('줌 모달 열기 오류:', error);
+                        alert('줌 예약 모달을 열 수 없습니다: ' + error.message);
+                    }
+                }
+            };
+            
+            roomsGrid.addEventListener('click', bookingClickHandler);
+            roomsGrid._bookingClickHandler = bookingClickHandler; // 나중에 제거하기 위해 저장
+            console.log('✅ 이벤트 위임 등록 완료 (rooms-grid)');
+        }
 
 
         // 필터
@@ -571,22 +618,41 @@ class UI {
         zoomBookBtn.style.width = '100%';
         zoomBookBtn.textContent = '줌 예약';
         zoomBookBtn.type = 'button';
+        zoomBookBtn.style.cursor = 'pointer';
+        zoomBookBtn.style.pointerEvents = 'auto';
+        zoomBookBtn.style.position = 'relative';
+        zoomBookBtn.style.zIndex = '999';
         
-        // 가장 간단하고 확실한 클릭 이벤트
-        zoomBookBtn.onclick = (e) => {
+        // 이벤트 위임과 함께 작동하도록 여러 방법으로 시도
+        const self = this;
+        
+        // onclick 이벤트
+        zoomBookBtn.onclick = function(e) {
             e.preventDefault();
             e.stopPropagation();
-            console.log('줌 예약 버튼 클릭 (onclick)');
+            console.log('🔵 줌 예약 버튼 onclick');
             
-            setTimeout(() => {
-                try {
-                    this.openZoomBookingModal();
-                } catch (error) {
-                    console.error('줌 모달 열기 오류:', error);
-                    alert('줌 예약 모달을 열 수 없습니다: ' + error.message);
-                }
-            }, 0);
+            try {
+                self.openZoomBookingModal();
+            } catch (error) {
+                console.error('줌 모달 열기 오류 (onclick):', error);
+                alert('줌 예약 모달을 열 수 없습니다: ' + error.message);
+            }
+            return false;
         };
+        
+        // addEventListener도 추가 (이중 보험)
+        zoomBookBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔵 줌 예약 버튼 addEventListener');
+            
+            try {
+                self.openZoomBookingModal();
+            } catch (error) {
+                console.error('줌 모달 열기 오류 (addEventListener):', error);
+            }
+        }, true); // 캡처 단계에서 실행
         
         zoomCard.appendChild(zoomBookBtn);
         
