@@ -453,12 +453,20 @@ class UI {
 
     renderBookings() {
         const list = document.getElementById('bookings-list');
+        if (!list) return; // bookings-list 요소가 없으면 종료
+        
         list.innerHTML = '';
+
+        // 데이터 확인
+        console.log('renderBookings 호출:', {
+            bookings: (this.dataManager.bookings || []).length,
+            zoomBookings: (this.dataManager.zoomBookings || []).length
+        });
 
         // 회의실 예약과 줌 예약을 합치기
         let allBookings = [
-            ...this.dataManager.bookings.map(b => ({...b, isZoom: false})),
-            ...this.dataManager.zoomBookings.map(b => ({...b, isZoom: true}))
+            ...(this.dataManager.bookings || []).map(b => ({...b, isZoom: false})),
+            ...(this.dataManager.zoomBookings || []).map(b => ({...b, isZoom: true}))
         ];
         
         // 날짜 필터
