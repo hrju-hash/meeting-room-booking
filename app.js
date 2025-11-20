@@ -62,6 +62,8 @@ class DataManager {
 
         bookingsRef.on('value', (snapshot) => {
             const data = snapshot.val();
+            console.log('Firebase bookings 데이터 수신:', data);
+            
             if (data) {
                 // Firebase는 객체로 저장되므로 배열로 변환
                 if (Array.isArray(data)) {
@@ -72,7 +74,22 @@ class DataManager {
             } else {
                 this.bookings = [];
             }
-            console.log('Firebase bookings 업데이트:', this.bookings.length, '개');
+            
+            console.log('Firebase bookings 업데이트 완료:', this.bookings.length, '개', this.bookings);
+            
+            // LocalStorage에도 동기화 (폴백용)
+            this.saveBookingsToLocal();
+            
+            if (this.callbacks.onBookingsUpdate) {
+                console.log('Bookings 업데이트 콜백 실행');
+                this.callbacks.onBookingsUpdate(this.bookings);
+            } else {
+                console.warn('Bookings 업데이트 콜백이 설정되지 않았습니다!');
+            }
+        }, (error) => {
+            console.error('Firebase bookings 읽기 오류:', error);
+            // 오류 발생 시 LocalStorage에서 로드
+            this.bookings = this.loadBookingsFromLocal();
             if (this.callbacks.onBookingsUpdate) {
                 this.callbacks.onBookingsUpdate(this.bookings);
             }
@@ -80,6 +97,8 @@ class DataManager {
 
         zoomBookingsRef.on('value', (snapshot) => {
             const data = snapshot.val();
+            console.log('Firebase zoomBookings 데이터 수신:', data);
+            
             if (data) {
                 // Firebase는 객체로 저장되므로 배열로 변환
                 if (Array.isArray(data)) {
@@ -90,7 +109,22 @@ class DataManager {
             } else {
                 this.zoomBookings = [];
             }
-            console.log('Firebase zoomBookings 업데이트:', this.zoomBookings.length, '개');
+            
+            console.log('Firebase zoomBookings 업데이트 완료:', this.zoomBookings.length, '개', this.zoomBookings);
+            
+            // LocalStorage에도 동기화 (폴백용)
+            this.saveZoomBookingsToLocal();
+            
+            if (this.callbacks.onZoomBookingsUpdate) {
+                console.log('ZoomBookings 업데이트 콜백 실행');
+                this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
+            } else {
+                console.warn('ZoomBookings 업데이트 콜백이 설정되지 않았습니다!');
+            }
+        }, (error) => {
+            console.error('Firebase zoomBookings 읽기 오류:', error);
+            // 오류 발생 시 LocalStorage에서 로드
+            this.zoomBookings = this.loadZoomBookingsFromLocal();
             if (this.callbacks.onZoomBookingsUpdate) {
                 this.callbacks.onZoomBookingsUpdate(this.zoomBookings);
             }
@@ -299,11 +333,16 @@ class UI {
         
         // Firebase 실시간 업데이트 콜백 설정
         if (this.dataManager.db) {
+            console.log('Firebase가 활성화되어 있습니다. 데이터 로딩 대기 중...');
+            
+            // 콜백이 호출될 때마다 렌더링
             this.dataManager.setOnBookingsUpdate(() => {
+                console.log('Bookings 업데이트 콜백 호출');
                 this.renderBookings();
                 this.renderCalendar();
             });
             this.dataManager.setOnZoomBookingsUpdate(() => {
+                console.log('ZoomBookings 업데이트 콜백 호출');
                 this.renderBookings();
                 this.renderCalendar();
             });
@@ -311,11 +350,24 @@ class UI {
                 this.renderRooms();
             });
             
-            // Firebase 초기화 후 약간의 지연을 두고 데이터 로드
+            // Firebase 초기화 후 데이터 로드 대기
+            // 여러 번 시도하여 데이터가 확실히 로드되도록
             setTimeout(() => {
+                console.log('초기 데이터 로드 시도 1');
                 this.renderBookings();
-            }, 500);
+            }, 300);
+            
+            setTimeout(() => {
+                console.log('초기 데이터 로드 시도 2');
+                this.renderBookings();
+            }, 1000);
+            
+            setTimeout(() => {
+                console.log('초기 데이터 로드 시도 3');
+                this.renderBookings();
+            }, 2000);
         } else {
+            console.log('LocalStorage를 사용합니다.');
             // LocalStorage 사용 시 즉시 렌더링
             this.renderBookings();
         }
@@ -378,10 +430,23 @@ class UI {
         });
 
         if (page === 'bookings') {
-            // 약간의 지연을 두어 데이터가 로드될 시간을 줌
+            // 필터 초기화
+            document.getElementById('filter-date').value = '';
+            document.getElementById('filter-room').value = '';
+            
+            // 데이터가 로드될 시간을 주기 위해 여러 번 시도
+            console.log('내 예약 페이지로 전환 - 데이터 로드 시작');
+            this.renderBookings(); // 즉시 시도
+            
             setTimeout(() => {
+                console.log('내 예약 페이지 - 데이터 로드 시도 2');
                 this.renderBookings();
-            }, 200);
+            }, 300);
+            
+            setTimeout(() => {
+                console.log('내 예약 페이지 - 데이터 로드 시도 3');
+                this.renderBookings();
+            }, 800);
         } else if (page === 'calendar') {
             this.renderCalendar();
         } else if (page === 'faq') {
