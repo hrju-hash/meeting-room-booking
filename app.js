@@ -1837,6 +1837,8 @@ class UI {
             holidays['2026-02-17'] = '설날';
             holidays['2026-02-18'] = '설날';
             holidays['2026-02-19'] = '설날';
+            holidays['2026-06-03'] = '지방선거';
+            holidays['2026-07-17'] = '제헌절';
             holidays['2026-09-24'] = '추석';
             holidays['2026-09-25'] = '추석';
             holidays['2026-09-26'] = '추석';
@@ -1854,13 +1856,18 @@ class UI {
             // 2025년 10월 10일을 공휴일에서 명시적으로 제외
             delete holidays['2025-10-10'];
         }
+        // 2026년 특별 처리 (대체공휴일이 아닌 날짜 명시적 제외)
+        if (year === 2026) {
+            delete holidays['2026-06-08'];
+            delete holidays['2026-09-28'];
+        }
         
         return holidays;
     }
 
     calculateSubstituteHolidays(year, holidays) {
         const substituteHolidays = {};
-        const excludeDates = ['2025-10-10']; // 대체공휴일이 아닌 날짜 목록
+        const excludeDates = ['2025-10-10', '2026-06-08', '2026-09-28']; // 대체공휴일이 아닌 날짜 목록
         
         // 모든 공휴일 확인
         for (const dateStr in holidays) {
