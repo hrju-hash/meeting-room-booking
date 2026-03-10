@@ -51,7 +51,7 @@ class DataManager {
             } else {
                 this.rooms = [];
             }
-            
+            this.applyRoomFacilityOverrides();
             if (this.rooms.length === 0) {
                 this.initDefaultRooms();
             }
@@ -180,10 +180,37 @@ class DataManager {
         }
     }
 
+    // Firebase/저장소에 예전 데이터가 있어도 화면·예약에 사용되는 장비는 항상 최신으로 통일
+    static get facilityByRoomId() {
+        return {
+            1: ['TV', '화이트보드'],
+            2: ['TV', '화이트보드'],
+            3: ['TV', '화이트보드'],
+            4: ['TV', '화이트보드', '음향시설']
+        };
+    }
+    applyRoomFacilityOverrides() {
+        (this.rooms || []).forEach(room => {
+            if (room && DataManager.facilityByRoomId[room.id]) {
+                room.facilities = DataManager.facilityByRoomId[room.id];
+            }
+        });
+    }
+    applyFacilityOverridesToRooms(rooms) {
+        if (!Array.isArray(rooms)) return rooms;
+        rooms.forEach(room => {
+            if (room && DataManager.facilityByRoomId[room.id]) {
+                room.facilities = DataManager.facilityByRoomId[room.id];
+            }
+        });
+        return rooms;
+    }
+
     // LocalStorage 폴백 메서드
     loadRoomsFromLocal() {
         const data = localStorage.getItem('meetingRooms');
-        return data ? JSON.parse(data) : [];
+        const rooms = data ? JSON.parse(data) : [];
+        return this.applyFacilityOverridesToRooms(rooms);
     }
 
     saveRoomsToLocal() {
@@ -1817,7 +1844,7 @@ class UI {
         holidays[`${year}-10-09`] = '한글날';
         holidays[`${year}-12-25`] = '크리스마스';
         
-        // 음력 공휴일 (2024-2026 기준)
+        // 음력 공휴일 (2024-2027 기준)
         if (year === 2024) {
             holidays['2024-02-10'] = '설날';
             holidays['2024-02-11'] = '설날';
@@ -1842,6 +1869,12 @@ class UI {
             holidays['2026-09-24'] = '추석';
             holidays['2026-09-25'] = '추석';
             holidays['2026-09-26'] = '추석';
+        } else if (year === 2027) {
+            holidays['2027-02-06'] = '설날연휴';
+            holidays['2027-02-07'] = '설날';
+            holidays['2027-02-08'] = '설날연휴';
+            holidays['2027-02-09'] = '대체휴일';
+            holidays['2027-05-13'] = '부처님 오신 날';
         }
         
         // 대체공휴일 계산 (공휴일이 토요일 또는 일요일인 경우 다음 평일을 대체공휴일로 지정)
