@@ -139,28 +139,28 @@ class DataManager {
                     name: '소회의실 A',
                     capacity: 4,
                     location: '1701호',
-                    facilities: ['프로젝터', '화이트보드']
+                    facilities: ['TV', '화이트보드']
                 },
                 {
                     id: 2,
                     name: '소회의실 B',
                     capacity: 6,
                     location: '1701호',
-                    facilities: ['프로젝터', '화이트보드']
+                    facilities: ['TV', '화이트보드']
                 },
                 {
                     id: 3,
                     name: '소회의실 C',
                     capacity: 8,
                     location: '1703호',
-                    facilities: ['프로젝터', '화이트보드']
+                    facilities: ['TV', '화이트보드']
                 },
                 {
                     id: 4,
                     name: '대회의실',
                     capacity: 20,
                     location: '1701호',
-                    facilities: ['프로젝터', '화이트보드', '전화', '음향시설']
+                    facilities: ['TV', '화이트보드', '음향시설']
                 }
             ];
             
